@@ -1,2 +1,2 @@
-# CaysAPIHub
-API Service Project
+# ElectiVote
+Vote Application
