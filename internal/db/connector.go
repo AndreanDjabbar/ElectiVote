@@ -19,6 +19,9 @@ func ConnectToDatabase() {
 	if err != nil {
 		panic(err.Error())
 	}
-	database.AutoMigrate(&models.AuthToken{})
+	database.AutoMigrate(
+		&models.AuthToken{},
+		&models.User{},
+	)
 	DB = database
 }

@@ -5,7 +5,10 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
+	"regexp"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GenerateSecureToken(username string) (string, error) {
@@ -22,3 +25,17 @@ func GenerateSecureToken(username string) (string, error) {
 	signature := base64.URLEncoding.EncodeToString(mac.Sum(nil))
 	return base64.URLEncoding.EncodeToString([]byte(data + ":" + signature)), nil
 }
+
+func IsValidEmail(email string) bool {
+	const emailPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.id)$`
+	re := regexp.MustCompile(emailPattern)
+	return re.MatchString(email)
+}
+
+func HashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    if err != nil {
+        return "", err
+    }
+    return string(hashedPassword), nil
+} 
