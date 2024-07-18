@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/AndreanDjabbar/CaysAPIHub/internal/middlewares"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/repositories"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/utils"
@@ -10,6 +11,15 @@ import (
 )
 
 func ViewRegisterPage(c *gin.Context) {
+
+	if middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/home-page/",
+		)
+		return
+	}
+
 	context := gin.H {
 		"title": "Register",
 	}
@@ -21,6 +31,15 @@ func ViewRegisterPage(c *gin.Context) {
 }
 
 func RegisterPage(c *gin.Context) {
+
+	if middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/home-page/",
+		)
+		return
+	}
+
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	email := c.PostForm("email")
