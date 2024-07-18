@@ -32,5 +32,9 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.POST("login-page/", handlers.LoginPage)
 		mainRouter.GET("register-page/", handlers.ViewRegisterPage)
 		mainRouter.POST("register-page/", handlers.RegisterPage)
+		mainRouter.GET("logout/", handlers.LogoutPage)
+	}
+	{
+		mainRouter.GET("home-page/", handlers.ViewHomePage)
 	}
 }
