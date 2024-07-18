@@ -14,10 +14,25 @@
             </div>
             <form style="display: flex; flex-direction: column; justify-content: center; width: 530px; margin-top: 60px" method="post">
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <input type="text" id="username" name="username" placeholder="Username" class="form-control" />
+                    {{if .usernameErr}}
+                    <input type="text" id="username" name="username" placeholder="Username"
+                    value="{{.username}}" class="form-control" />
+                    <p style="color: red;">{{.usernameErr}}</p>
+                    {{else}}
+                    <input type="text" id="username" name="username" 
+                    value="{{.username}}"
+                    placeholder="Username" class="form-control" />
+                    {{end}}
                 </div>   
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <input type="password" id="password" name="password" placeholder="Password" class="form-control"/>
+                    {{if .passwordErr}}
+                    <input type="password" id="password" name="password" placeholder="Password"
+                    value="{{.password}}" class="form-control"/>
+                    <p style="color: red;">{{.passwordErr}}</p>
+                    {{else}}
+                    <input type="password" id="password" name="password" placeholder="Password"
+                    value="{{.password}}" class="form-control"/>
+                    {{end}}
                 </div>
                 <div class="row mb-4">
                     <div class="col d-flex justify-content-center">

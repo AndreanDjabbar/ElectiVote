@@ -22,6 +22,7 @@ func main() {
 		store.Options(sessions.Options{
 			MaxAge: 0,
 			HttpOnly: true,
+			Path: "/",
 			Secure: false,
 		})
 	}
