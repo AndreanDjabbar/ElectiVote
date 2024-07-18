@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"regexp"
 	"time"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -39,3 +38,4 @@ func HashPassword(password string) (string, error) {
     }
     return string(hashedPassword), nil
 } 
+
