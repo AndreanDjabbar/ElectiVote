@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/middlewares"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
@@ -11,7 +12,6 @@ import (
 )
 
 func ViewRegisterPage(c *gin.Context) {
-
 	if middlewares.IsLogged(c) {
 		c.Redirect(
 			http.StatusFound,
@@ -42,40 +42,23 @@ func RegisterPage(c *gin.Context) {
 
 	username := c.PostForm("username")
 	password := c.PostForm("password")
+	password2 := c.PostForm("password2")
 	email := c.PostForm("email")
 
-	usernameErr, passwordErr, emailErr := "", "", ""
+	usernameErr, passwordErr, password2Err, emailErr := utils.ValidateRegisterInput(username, password, password2, email)
 
-	if username == "" {
-		usernameErr = "Username must be filled"
-	}
+	if usernameErr == "" && passwordErr == "" && password2Err == "" && emailErr == "" {
+		var wg sync.WaitGroup
+		var hashedPassword string
+		var hashErr, err error
+		var regMu sync.Mutex
 
-	if password == "" {
-		passwordErr = "Password must be filled"
-	}
-
-	if email == "" {
-		emailErr = "Email must be filled"
-	}
-
-	if len(username) != 0 && (len(username) < 5 || len(username) > 255) {
-		usernameErr = "Username must be between 5 and 255 characters"
-	}
-
-	if len(password) != 0 && (len(password) < 5 || len(password) > 255) {
-		passwordErr = "Password must be between 5 and 255 characters"
-	}
-
-	if email != "" && !utils.IsValidEmail(email) {
-		emailErr = "Email must contain @ and end with .com or .co.id"
-	}
-
-	if usernameErr == "" && passwordErr == "" && emailErr == "" {
-		hashedPassword, err := utils.HashPassword(password)
-		if err != nil {
+		hashedPassword, hashErr = utils.HashPassword(password)
+		
+		if hashErr != nil {
 			context := gin.H {
 				"title": "Error",
-				"error": err.Error(),
+				"error": hashErr.Error(),
 				"source": "/electivote/register-page/",
 			}
 			c.HTML(
@@ -84,13 +67,22 @@ func RegisterPage(c *gin.Context) {
 				context,
 			)
 		}
-		newUser := models.User{
-			Username: username,
-			Password: hashedPassword,
-			Email: email,
-			Role: "user",
-		}
-		_, err = repositories.RegisterUser(newUser)
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			regMu.Lock()
+			newUser := models.User{
+				Username: username,
+				Password: hashedPassword,
+				Email: email,
+				Role: "user",
+			}
+			_, err = repositories.RegisterUser(newUser)
+			regMu.Unlock()
+		}()
+		wg.Wait()
+
 		if err != nil {
 			context := gin.H {
 				"title": "Error",
@@ -113,9 +105,11 @@ func RegisterPage(c *gin.Context) {
 		"title": "Register",
 		"usernameErr": usernameErr,
 		"passwordErr": passwordErr,
+		"password2Err": password2Err,
 		"emailErr": emailErr,
 		"username": username,
 		"password": password,
+		"password2": password2,
 		"email": email,
 	}
 	c.HTML(
