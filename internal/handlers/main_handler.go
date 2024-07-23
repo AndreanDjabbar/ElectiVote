@@ -28,3 +28,25 @@ func ViewHomePage(c *gin.Context) {
 		context,
 	)
 }
+
+func ViewProfilePage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	
+	dataUser := middlewares.GetUserData(c)
+
+	context := gin.H {
+		"title": "Profile",
+		"dataUser": dataUser,
+	}
+	c.HTML(
+		http.StatusOK,
+		"profile.html",
+		context,
+	)
+}
