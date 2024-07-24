@@ -18,6 +18,8 @@ func main() {
 	store := cookie.NewStore([]byte("secret"))
 	{
 		router.LoadHTMLGlob("../../internal/views/html/*.html")
+		router.Static("/images", "../../internal/assets/images")
+		router.MaxMultipartMemory = 8 << 20
 		router.Use(sessions.Sessions(SessionKey, store))
 		store.Options(sessions.Options{
 			MaxAge: 0,
