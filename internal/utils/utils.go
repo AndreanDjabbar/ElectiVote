@@ -2,27 +2,43 @@ package utils
 
 import (
 	"crypto/hmac"
-	"crypto/rand"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
+	"fmt"
 	"regexp"
+	"strings"
 	"time"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
+var secretKey []byte = []byte("A-0f87g-BC-0991")
+
 func GenerateSecureToken(username string) (string, error) {
-	randomBytes := make([]byte, 32)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		return "", err
+	timestamp := time.Now().Unix()
+	data := fmt.Sprintf("%s:%d", username, timestamp)
+	h := hmac.New(sha256.New, []byte(secretKey))
+	h.Write([]byte(data))
+	signature := hex.EncodeToString(h.Sum(nil))
+	return fmt.Sprintf("%s:%s", data, signature), nil
+}
+
+func ExtractUsername(token string) (string, error) {
+	parts := strings.Split(token, ":")
+	if len(parts) != 3 {
+		return "", fmt.Errorf("invalid token format")
 	}
 
-	data := username + ":" + time.Now().Format(time.RFC3339) + ":" + base64.URLEncoding.EncodeToString(randomBytes)
+	data := fmt.Sprintf("%s:%s", parts[0], parts[1])
+	h := hmac.New(sha256.New, []byte(secretKey))
+	h.Write([]byte(data))
+	expectedSignature := hex.EncodeToString(h.Sum(nil))
 
-	mac := hmac.New(sha256.New, randomBytes)
-	mac.Write([]byte(data))
-	signature := base64.URLEncoding.EncodeToString(mac.Sum(nil))
-	return base64.URLEncoding.EncodeToString([]byte(data + ":" + signature)), nil
+	if !hmac.Equal([]byte(expectedSignature), []byte(parts[2])) {
+		return "", fmt.Errorf("invalid token signature")
+	}
+
+	return parts[0], nil
 }
 
 func IsValidEmail(email string) bool {
