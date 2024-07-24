@@ -5,6 +5,11 @@ go 1.22.1
 require github.com/gin-contrib/sessions v1.0.1
 
 require (
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	gorm.io/driver/mysql v1.5.7 // indirect
+)
+
+require (
 	github.com/bytedance/sonic v1.11.9 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

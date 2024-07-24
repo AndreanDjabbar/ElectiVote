@@ -45,13 +45,16 @@ func LoginPage(c *gin.Context) {
 	usernameErr, passwordErr := utils.ValidateLoginInput(username, password)
 	var usernameCheckErr, passwordCheckErr error
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 
 	if usernameErr == "" {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			if _, err := repositories.GetUserByUsername(username); err != nil {
+				mu.Lock()
 				usernameCheckErr = err
+				mu.Unlock()
 			}
 		}() 
 	}
@@ -61,7 +64,9 @@ func LoginPage(c *gin.Context) {
 		go func() {
 			defer wg.Done()
 			if _, err := repositories.CheckPasswordByUSername(username, password); err != nil {
+				mu.Lock()
 				passwordCheckErr = err
+				mu.Unlock()
 			}
 		}()
 	

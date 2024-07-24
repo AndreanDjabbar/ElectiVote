@@ -36,5 +36,7 @@ func SetUpRoutes(router *gin.Engine) {
 	}
 	{
 		mainRouter.GET("home-page/", handlers.ViewHomePage)
+		mainRouter.GET("profile-page/", handlers.ViewProfilePage)
+		mainRouter.GET("edit-profile-page/", handlers.ViewEditProfilePage)
 	}
 }
