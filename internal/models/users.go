@@ -12,11 +12,12 @@ type User struct {
 
 type Profile struct {
 	ProfileID   uint   `gorm:"primary_key"`
-	FirstName   string `gorm:"type:varchar(255);not null"`
-	LastName    string `gorm:"type:varchar(255);not null"`
-	Age         uint   `gorm:"type:int;not null"`
-	PhoneNumber string `gorm:"type:varchar(255);not null"`
-	Birthday 	time.Time `gorm:"type:date;not null"`
+	Picture	 string `gorm:"type:varchar(255)"`
+	FirstName   string `gorm:"type:varchar(255)"`
+	LastName    string `gorm:"type:varchar(255)"`
+	Age         uint   `gorm:"type:int;default:NULL"`
+	PhoneNumber string `gorm:"type:varchar(255)"`
+	Birthday 	*time.Time `gorm:"type:date;default:NULL"`
 	UserID      uint
 	User      User   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
