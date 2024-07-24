@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -117,4 +118,17 @@ func ValidateRegisterInput(username, password, password2, email string) (string,
 	}
 	
 	return usernameErr, passwordErr, password2Err, emailErr
+}
+
+func RenderError(c *gin.Context, statusCode int, errMsg string, source string) {
+	context := gin.H{
+		"title":  "Error",
+		"error":  errMsg,
+		"source": source,
+	}
+	c.HTML(
+		statusCode,
+		"error.html",
+		context,
+	)
 }
