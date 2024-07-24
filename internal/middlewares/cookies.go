@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"time"
+
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -30,8 +31,12 @@ func GetCookies(c *gin.Context) string {
 	cookie, err := c.Cookie(cookieKey)
 	if err != nil {
 		return ""
+	} 
+	resultCookie, err := utils.ExtractUsername(cookie)
+	if err != nil {
+		return ""
 	}
-	return cookie
+	return resultCookie
 }
 
 func IsLogged(c *gin.Context) bool {
