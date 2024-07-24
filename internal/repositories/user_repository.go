@@ -37,3 +37,42 @@ func CheckPasswordByUSername(username, password string) (bool, error) {
 	}
 	return true, nil
 }
+
+func GetUserIdByUsername(username string) (int, error) {
+	user := models.User{}
+	err := db.DB.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return 0, err
+	}
+	return int(user.ID), nil
+}
+
+func GetUserEmailByUsername(username string) (string, error) {
+	user := models.User{}
+	err := db.DB.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return "", err
+	}
+	return user.Email, nil
+}
+
+func CreateProfile(newProfile models.Profile) (models.Profile, error) {
+	err := db.DB.Create(&newProfile).Error
+	if err != nil {
+		return newProfile, err
+	}
+	return newProfile, nil
+}
+
+func GetProfilesByUsername(username string) (models.Profile, error) {
+	userId, err := GetUserIdByUsername(username)
+	if err != nil {
+		return models.Profile{}, err
+	}
+	profile := models.Profile{}	
+	err = db.DB.Where("user_id = ?", userId).First(&profile).Error
+	if err != nil {
+		return models.Profile{}, err
+	}
+	return profile, nil
+}
