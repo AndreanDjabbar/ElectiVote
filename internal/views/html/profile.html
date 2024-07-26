@@ -47,7 +47,7 @@
                   <div class="col-md-4 gradient-custom text-center text-white"
                     style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
                     <img src="/images/{{.userProfile.Picture}}"
-                      alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
+                      alt="Avatar" class="img-fluid my-5" style="width: 120px;" />
                     {{ if or .userProfile.FirstName .userProfile.LastName }}
                       <h5>{{ .userProfile.FirstName }} {{.userProfile.LastName}}</h5>
                       {{ else }}
@@ -92,7 +92,7 @@
                         <div class="col-6 mb-3">
                           <h6>Birthday</h6>
                           {{ if .userProfile.Birthday }}
-                            <p class="text-muted">{{ .userProfile.Birthday }}</p>
+                            <p class="text-muted">{{ .birthday }}</p>
                             {{ else }}
                           <p class="text-muted">None</p>
                           {{ end }}
