@@ -43,7 +43,7 @@
             <div style="display: flex; flex-direction: column; justify-content: center; width: 60%; margin-top: 60px">
                 <h1 class="text-center">Edit Profile</h1>
             </div>
-            <form style="display: flex; flex-direction: column; justify-content: center; width: 530px; margin-top: 60px" method="post">
+            <form style="display: flex; flex-direction: column; justify-content: center; width: 530px; margin-top: 60px" method="post" enctype="multipart/form-data">
                 <div data-mdb-input-init class="form-outline mb-4">
                     <p style="color: red;">{{.usernameErr}}</p>
                     <div style="display: flex; gap: 45px;">
@@ -58,17 +58,23 @@
                             class="form-control" 
                             style="width: 230px;"/>
                             {{end}}
+                            {{if .firstNameErr}}
+                                <p style="color: red;">{{.firstNameErr}}</p>
+                            {{end}}
                         </div>
                         <div style="display: flex; flex-direction: column;">
-                            <label for="firstName">*LastName</label>
+                            <label for="lastName">*LastName</label>
                             {{if .userProfile.LastName}}
-                            <input type="text" id="lastName" name="lastName" placeholder="Last Name" value="{{.userProfile.lastName}}"
+                            <input type="text" id="lastName" name="lastName" placeholder="Last Name" value="{{.userProfile.LastName}}"
                             class="form-control" 
                             style="width: 230px;"/>
                             {{else}}
                             <input type="text" id="lastName" name="lastName" placeholder="None"
                             class="form-control" 
                             style="width: 230px;"/>
+                            {{end}}
+                            {{if .lastNameErr}}
+                                <p style="color: red;">{{.lastNameErr}}</p>
                             {{end}}
                         </div>
                     </div>
@@ -79,35 +85,52 @@
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
                     <label for="age">*Age</label>
+                    {{if .userProfile.Age}}
+                    <input type="number" id="age" name="age" class="form-control" value="{{.userProfile.Age}}" min="0">
+                    {{else}}
                     <input type="number" id="age" name="age" class="form-control" value="0" min="0">
+                    {{end}}
+                    {{if .ageErr}}
+                        <p style="color: red;">{{.ageErr}}</p>
+                    {{end}}
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
                     <label for="phone">*Phone</label>
                     {{if .userProfile.PhoneNumber}}
-                        <input type="text" id="phone" name="age" placeholder="Phone Number"
+                        <input type="text" id="phone" name="phone" placeholder="Phone Number"
                         value="{{.userProfile.PhoneNumber}}" class="form-control">
                         {{else}}
-                        <input type="text" id="phone" name="age" placeholder="None"
+                        <input type="text" id="phone" name="phone" placeholder="None"
                         class="form-control">
+                    {{end}}
+                    {{if .phoneErr}}
+                        <p style="color: red;">{{.phoneErr}}</p>
                     {{end}}
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
                     <label for="dob">*Date of Birth</label>
-                    {{if .userProfile.Birthday}}
-                        <input type="date" id="dob" name="dob" class="form-control" value="{{.userProfile.Birthday}}">
+                    {{if .birthday}}
+                        <input type="date" id="dob" name="dob"
+                        value="{{.birthday}}"
+                        class="form-control">
                         {{else}}
                         <input type="date" id="dob" name="dob" class="form-control">
+                    {{end}}
+                    {{if .dobErr}}
+                        <p style="color: red;">{{.dobErr}}</p>
                     {{end}}
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
                     <label for="picture">*Profile Picture</label>
                     <input type="file" id="picture" name="picture" class="form-control">
                 </div>
-                <div class="row mb-4">
-                    <div class="col d-flex justify-content-center">
+                <div style="display: flex; justify-content: center; gap: 100px;">
+                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../profile-page">Cancel</a>
+                    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Update</button>
+                </div>
+            </form>
         </div>
     </div>
-    <button  type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" >Update</button>
     <br><br><br><br><br><br><br><br><br><br>
     <script>
         feather.replace();
