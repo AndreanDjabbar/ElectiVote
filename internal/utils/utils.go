@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
+	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -120,6 +120,33 @@ func ValidateRegisterInput(username, password, password2, email string) (string,
 	return usernameErr, passwordErr, password2Err, emailErr
 }
 
+func IsValidPhoneNumber(phone string) bool {
+	isValid := regexp.MustCompile(`^[0-9]+$`).MatchString(phone)
+	return isValid
+}
+
+func ValidateProfileInput(firstName, lastname, phone string, age uint) (string, string, string, string) {
+	firstNameErr, lastNameErr, phoneErr, ageErr :=  "", "", "", ""
+
+	if firstName != "" && (len(firstName) < 5 || len(firstName) > 255) {
+		firstNameErr = "First Name must be between 5 and 255 characters"
+	}
+
+	if lastname != "" && (len(lastname) < 5 || len(lastname) > 255) {
+		lastNameErr = "Last Name must be between 5 and 255 characters"
+	}
+
+	if age != 0 && (age <= 5 || age > 100) {
+		ageErr = "Age must be between 5 and 100"
+	}
+
+	if phone != "" && !IsValidPhoneNumber(phone) {
+		phoneErr = "Phone number must be a number"
+	}
+
+	return firstNameErr, lastNameErr, phoneErr, ageErr
+}
+
 func RenderError(c *gin.Context, statusCode int, errMsg string, source string) {
 	context := gin.H{
 		"title":  "Error",
@@ -131,4 +158,11 @@ func RenderError(c *gin.Context, statusCode int, errMsg string, source string) {
 		"error.html",
 		context,
 	)
+}
+
+func FormattedDob(nt models.NullTime) string {
+	if nt.Valid {
+		return nt.Time.Format("2006-01-02")
+	}
+	return ""
 }
