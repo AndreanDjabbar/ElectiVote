@@ -1,4 +1,4 @@
-internal/db/electivote.db
 internal/assets/images/*
 .air.toml
 tmp/
+.env
