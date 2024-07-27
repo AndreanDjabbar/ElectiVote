@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"github.com/AndreanDjabbar/CaysAPIHub/internal/factories"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/middlewares"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/repositories"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -51,12 +51,7 @@ func RegisterPage(c *gin.Context) {
 			return
 		}
 
-		newUser := models.User{
-			Username: username,
-			Password: hashedPassword,
-			Email:    email,
-			Role:     "user",
-		}
+		newUser := factories.CreateUser(username, hashedPassword, email, "user")
 
 		_, err := repositories.RegisterUser(newUser)
 		if err != nil {
@@ -70,10 +65,8 @@ func RegisterPage(c *gin.Context) {
 			return
 		}
 
-		newProfile := models.Profile{
-			UserID: uint(userID),
-			Picture: "default.png",
-		}
+		newProfile := factories.CreateFirstProfile(userID)
+
 		_, err = repositories.CreateProfile(newProfile)
 		if err != nil {
 			utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
