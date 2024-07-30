@@ -5,15 +5,17 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"time"
+
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var secretKey []byte = []byte("A-0f87g-BC-0991")
+var secretKey []byte = []byte(os.Getenv("SECRET_KEY"))
 
 func GenerateSecureToken(username string) (string, error) {
 	timestamp := time.Now().Unix()
