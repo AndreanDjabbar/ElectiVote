@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/factories"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/middlewares"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/repositories"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/utils"
+	"github.com/AndreanDjabbar/ElectiVote/internal/factories"
+	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
+	"github.com/AndreanDjabbar/ElectiVote/internal/models"
+	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
+	"github.com/AndreanDjabbar/ElectiVote/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -243,7 +243,7 @@ func EditProfilePage(c *gin.Context) {
 				)
 			}
 			newProfile.Picture = file.Filename
-			err = c.SaveUploadedFile(file, "../../internal/assets/images/"+file.Filename)
+			err = c.SaveUploadedFile(file, "internal/assets/images/"+file.Filename)
 			if err != nil {
 				utils.RenderError(
 					c,

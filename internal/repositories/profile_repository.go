@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/db"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
+	"github.com/AndreanDjabbar/ElectiVote/internal/db"
+	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 )
 
 func CreateProfile(newProfile models.Profile) (models.Profile, error) {

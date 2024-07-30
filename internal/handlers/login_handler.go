@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/middlewares"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/repositories"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/utils"
+	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
+	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
+	"github.com/AndreanDjabbar/ElectiVote/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 

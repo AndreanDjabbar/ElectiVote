@@ -1,8 +1,11 @@
 package main
 
 import (
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/db"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/routes"
+	"fmt"
+	"os"
+
+	"github.com/AndreanDjabbar/ElectiVote/internal/db"
+	"github.com/AndreanDjabbar/ElectiVote/internal/routes"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -17,8 +20,8 @@ func main() {
 	router := gin.Default()
 	store := cookie.NewStore([]byte("secret"))
 	{
-		router.LoadHTMLGlob("../../internal/views/html/*.html")
-		router.Static("/images", "../../internal/assets/images")
+		router.LoadHTMLGlob("internal/views/html/*.html")
+		router.Static("/images", "internal/assets/images")
 		router.MaxMultipartMemory = 8 << 20
 		router.Use(sessions.Sessions(SessionKey, store))
 		store.Options(sessions.Options{
@@ -28,9 +31,10 @@ func main() {
 			Secure: false,
 		})
 	}
-	
+	port := os.Getenv("PORT")
+	host := os.Getenv("HOST")
 	routes.SetUpRoutes(router)
-	err := router.Run("localhost:8080")
+	err := router.Run(fmt.Sprintf("%s:%s",host, port))
 	if err != nil {
 		panic(err)
 	}

@@ -1,7 +1,7 @@
 package factories
 
 import (
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
+	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 )
 
 func CreateFirstProfile(userId int) (models.Profile) {

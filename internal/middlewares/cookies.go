@@ -3,7 +3,7 @@ package middlewares
 import (
 	"time"
 
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/utils"
+	"github.com/AndreanDjabbar/ElectiVote/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
