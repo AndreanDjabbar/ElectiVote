@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/db"
 	"github.com/AndreanDjabbar/CaysAPIHub/internal/routes"
 	"github.com/gin-contrib/sessions"
@@ -28,9 +31,10 @@ func main() {
 			Secure: false,
 		})
 	}
-	
+	port := os.Getenv("PORT")
+	host := os.Getenv("HOST")
 	routes.SetUpRoutes(router)
-	err := router.Run("localhost:8080")
+	err := router.Run(fmt.Sprintf("%s:%s",host, port))
 	if err != nil {
 		panic(err)
 	}
