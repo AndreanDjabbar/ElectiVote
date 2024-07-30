@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/handlers"
+	"github.com/AndreanDjabbar/ElectiVote/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
 

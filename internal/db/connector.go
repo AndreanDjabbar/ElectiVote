@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
+	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

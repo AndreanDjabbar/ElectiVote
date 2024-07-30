@@ -1,6 +1,6 @@
 package factories
 
-import "github.com/AndreanDjabbar/CaysAPIHub/internal/models"
+import "github.com/AndreanDjabbar/ElectiVote/internal/models"
 
 func CreateUser(username, password, email, role string) (models.User) {
 	newUser := models.User{

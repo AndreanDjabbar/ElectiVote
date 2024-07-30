@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/middlewares"
+	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
 )
 
 func ViewHomePage(c *gin.Context) {

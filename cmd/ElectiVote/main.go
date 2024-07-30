@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/db"
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/routes"
+	"github.com/AndreanDjabbar/ElectiVote/internal/db"
+	"github.com/AndreanDjabbar/ElectiVote/internal/routes"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"

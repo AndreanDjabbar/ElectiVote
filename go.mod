@@ -1,4 +1,4 @@
-module github.com/AndreanDjabbar/CaysAPIHub
+module github.com/AndreanDjabbar/ElectiVote
 
 go 1.22.1
 

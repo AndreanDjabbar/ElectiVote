@@ -2,20 +2,23 @@ package utils
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/AndreanDjabbar/CaysAPIHub/internal/models"
+	"github.com/AndreanDjabbar/ElectiVote/internal/models"
+	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
 var secretKey []byte = []byte(os.Getenv("SECRET_KEY"))
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func GenerateSecureToken(username string) (string, error) {
 	timestamp := time.Now().Unix()
@@ -167,4 +170,24 @@ func FormattedDob(nt models.NullTime) string {
 		return nt.Time.Format("2006-01-02")
 	}
 	return ""
+}
+
+func voteCodeMaker() string {
+    result := make([]byte, 6)
+    for i := range result {
+        num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+        if err != nil {
+            return ""
+        }
+        result[i] = charset[num.Int64()]
+    }
+    return string(result)
+}
+
+func GenerateVoteCode() string {
+	voteCode := voteCodeMaker()
+	for !repositories.IsUniqueCode(voteCode) {
+		voteCode = voteCodeMaker()
+	}
+	return voteCode
 }
