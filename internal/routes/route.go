@@ -43,5 +43,10 @@ func SetUpRoutes(router *gin.Engine) {
 	{
 		mainRouter.GET("create-vote-page/", handlers.ViewCreateVotePage)
 		mainRouter.POST("create-vote-page/", handlers.CreateVotePage)
+		mainRouter.GET("manage-vote-page/", handlers.ViewManageVotesPage)
+		mainRouter.GET("manage-vote-page/:voteID/", handlers.ViewManageVotePage)
+		mainRouter.POST("manage-vote-page/:voteID/", handlers.ManageVotePage)
+		mainRouter.GET("delete-vote-page/:voteID/", handlers.ViewDeleteVotePage)
+		mainRouter.GET("delete-vote/:voteID/", handlers.DeleteVotePage)
 	}
 }

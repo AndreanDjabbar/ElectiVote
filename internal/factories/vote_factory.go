@@ -1,12 +1,10 @@
 package factories
 
 import (
-	"time"
-
 	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 )
 
-func StartVoteFactory(voteTitle, voteDescription, voteCode string, moderatorID uint, start time.Time) (models.Vote) {
+func StartVoteFactory(voteTitle, voteDescription, voteCode string, moderatorID uint, start models.CustomTime) (models.Vote) {
 	newVote := models.Vote{
 		VoteTitle:       voteTitle,
 		VoteDescription: voteDescription,
@@ -15,4 +13,12 @@ func StartVoteFactory(voteTitle, voteDescription, voteCode string, moderatorID u
 		Start:           start,
 	}
 	return newVote
+}
+
+func UpdateVoteFactory(voteTitle, voteDescription string) (models.Vote) {
+	updatedVote := models.Vote{
+		VoteTitle:       voteTitle,
+		VoteDescription: voteDescription,
+	}
+	return updatedVote
 }

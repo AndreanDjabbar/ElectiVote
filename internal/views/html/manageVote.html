@@ -41,7 +41,7 @@
     <div class="container">
         <div class="row justify-content-center" style="margin-top: 100px;">
             <div style="display: flex; flex-direction: column; justify-content: center; width: 60%; margin-top: 60px">
-                <h1 class="text-center">Create Vote</h1>
+                <h1 class="text-center">Manage Vote</h1>
             </div>
             <form style="display: flex; flex-direction: column; justify-content: center; width: 530px; margin-top: 60px" method="post" enctype="multipart/form-data">
                 <div data-mdb-input-init class="form-outline mb-4">
@@ -49,9 +49,8 @@
                         <label for="voteTitle">*Vote Title</label>
                         <input type="text" class="form-control"
                         id="voteTitle"
-                        value="{{.voteTitle}}"
                         name="voteTitle"
-                        required>
+                        value="{{.voteData.VoteTitle}}">
                         {{if .voteTitleErr}}
                             <p style="color: red;">{{.voteTitleErr}}</p>
                         {{end}}
@@ -59,11 +58,15 @@
                 </div>   
                 <div data-mdb-input-init class="form-outline mb-4">
                     <label for="voteDesc">*Vote Description</label>
-                    <textarea name="voteDesc" id="voteDesc" class="form-control" rows="5">{{.voteDesc}}</textarea>
+                    <textarea name="voteDesc" id="voteDesc" class="form-control" rows="5" >{{.voteData.VoteDescription}}</textarea>
                 </div>
+                <div data-mdb-input-init class="form-outline mb-4">
+                    <a href="" class="form-control btn btn-success" style="text-decoration: none; display: flex; justify-content: center;"><i data-feather="plus" ></i> Add Candidate</a>
+                </div>
+                <br><br><br>
                 <div style="display: flex; justify-content: center; gap: 100px;">
-                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../home-page">Cancel</a>
-                    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Create</button>
+                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../">Back</a>
+                    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Update</button>
                 </div>
             </form>
         </div>
