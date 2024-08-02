@@ -29,7 +29,7 @@
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="">Profile</a>
+                <a class="nav-link active" aria-current="page" href="" >Profile</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="../logout">Logout</a>
@@ -41,34 +41,69 @@
     <div class="container">
         <div class="row justify-content-center" style="margin-top: 100px;">
             <div style="display: flex; flex-direction: column; justify-content: center; width: 60%; margin-top: 60px">
-                <h1 class="text-center">Create Vote</h1>
+                <h1 class="text-center">Manage Vote</h1>
             </div>
-            <form style="display: flex; flex-direction: column; justify-content: center; width: 530px; margin-top: 60px" method="post" enctype="multipart/form-data">
-                <div data-mdb-input-init class="form-outline mb-4">
-                    <div data-mdb-input-init class="form-outline mb-4">
-                        <label for="voteTitle">*Vote Title</label>
-                        <input type="text" class="form-control"
-                        id="voteTitle"
-                        value="{{.voteTitle}}"
-                        name="voteTitle"
-                        required>
-                        {{if .voteTitleErr}}
-                            <p style="color: red;">{{.voteTitleErr}}</p>
-                        {{end}}
+        </div>
+        <div class="py-5">
+          <div class="container">
+            <div class="row hidden-md-up">
+              {{range .votes}}
+                <div class="col-md-4">
+                  <div class="card">
+                    <div class="card-block">
+                      <h4 class="card-title">{{.VoteTitle}}</h4>
+                      <br>
+                      <div style="display: flex; flex-direction: column;">
+                        <h6 class="card-subtitle text-muted">{{.VoteCode}}</h6>
+                        <button class="btn btn-primary copy-button" data-code="{{.VoteCode}}" style="width: 60px; font-size: 13px;">Copy</button>
+                      </div>
+                      <br>
+                      <p class="card-text p-y-1">{{.VoteDescription}}</p>
+                      <a href="{{.VoteID}}" class="card-link">Manage</a>
+                      <a href="/electivote/delete-vote-page/{{.VoteID}}" class="card-link">Delete Vote</a>
                     </div>
-                </div>   
-                <div data-mdb-input-init class="form-outline mb-4">
-                    <label for="voteDesc">*Vote Description</label>
-                    <textarea name="voteDesc" id="voteDesc" class="form-control" rows="5">{{.voteDesc}}</textarea>
+                  </div>
                 </div>
-                <div style="display: flex; justify-content: center; gap: 100px;">
-                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../home-page">Cancel</a>
-                    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Create</button>
-                </div>
-            </form>
+              {{end}}
+            </div><br>
+          </div>
         </div>
     </div>
+    <br><br><br><br><br>
+    <div style="display: flex; justify-content: center; gap: 100px;">
+      <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../home-page">Back</a>
+  </div>
     <br><br><br><br><br><br><br><br><br><br>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const copyButtons = document.querySelectorAll('.copy-button');
+      
+        copyButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const code = this.getAttribute('data-code');
+            copyToClipboard(code);
+            changeToP(this, 'Copied!');
+          });
+        });
+      
+        function copyToClipboard(text) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          document.body.appendChild(textarea);
+          textarea.select();
+          textarea.setSelectionRange(0, 99999);
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+        }
+      
+        function changeToP(button, text) {
+          const p = document.createElement('p');
+          p.innerText = text;
+          p.style.color = 'green';
+          button.parentNode.replaceChild(p, button);
+        }
+      });
+      </script>
     <script>
         feather.replace();
     </script>
