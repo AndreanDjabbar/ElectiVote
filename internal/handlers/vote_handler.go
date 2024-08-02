@@ -61,7 +61,7 @@ func CreateVotePage(c *gin.Context) {
 		voteTitleErr = "Vote title must be at least 5 characters"
 	}
 
-	if voteTitleErr != "" {
+	if voteTitleErr == "" {
 		newVote := factories.StartVoteFactory(voteTitle, voteDesc, voteCode, uint(moderatorID), start)
 	
 		_, err = repositories.CreateVote(newVote)
