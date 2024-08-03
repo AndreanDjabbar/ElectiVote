@@ -35,9 +35,10 @@ func ConnectToDatabase() {
 		panic(err.Error())
 	}
 	database.AutoMigrate(
+		&models.Vote{},
+		&models.Candidate{},
 		&models.User{},
 		&models.Profile{},
-		&models.Vote{},
 	)
 	DB = database
 }
