@@ -38,6 +38,7 @@ func ConnectToDatabase() {
 		&models.User{},
 		&models.Profile{},
 		&models.Vote{},
+		&models.Candidate{},
 	)
 	DB = database
 }
