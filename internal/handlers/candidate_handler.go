@@ -61,7 +61,7 @@ func AddCandidatePage(c *gin.Context) {
 	}
 	candidateNameErr := ""
 	candidateName := c.PostForm("candidateName")
-	candidateDescription := c.PostForm("candidateDescription")
+	candidateDescription := c.PostForm("candidateDesc")
 	candidatePicture, candidatePictureErr := c.FormFile("candidatePicture")
 
 	if len(candidateName) < 3 {
@@ -98,6 +98,7 @@ func AddCandidatePage(c *gin.Context) {
 			candidatePicture,
 			"internal/assets/images/"+candidatePicture.Filename,
 		)
+		newCandidate.CandidatePicture = candidatePicture.Filename
 		if err != nil {
 			utils.RenderError(
 				c,
