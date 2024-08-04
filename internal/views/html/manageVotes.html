@@ -29,7 +29,7 @@
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="" >Profile</a>
+                <a class="nav-link active" aria-current="page" href="../profile-page" >Profile</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="../logout">Logout</a>
@@ -44,36 +44,44 @@
                 <h1 class="text-center">Manage Vote</h1>
             </div>
         </div>
-        <div class="py-5">
-          <div class="container">
-            <div class="row hidden-md-up">
-              {{range .votes}}
-                <div class="col-md-4">
-                  <div class="card">
-                    <div class="card-block">
-                      <h4 class="card-title">{{.VoteTitle}}</h4>
-                      <br>
-                      <div style="display: flex; flex-direction: column;">
-                        <h6 class="card-subtitle text-muted">{{.VoteCode}}</h6>
-                        <button class="btn btn-primary copy-button" data-code="{{.VoteCode}}" style="width: 60px; font-size: 13px;">Copy</button>
+        {{if .votes}}
+          <div class="py-5">
+            <div class="container">
+              <div class="row hidden-md-up">
+                {{range .votes}}
+                  <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-block">
+                        <h4 class="card-title">{{.VoteTitle}}</h4>
+                        <br>
+                        <div style="display: flex; flex-direction: column;">
+                          <h6 class="card-subtitle text-muted">{{.VoteCode}}</h6>
+                          <button class="btn btn-primary copy-button" data-code="{{.VoteCode}}" style="width: 60px; font-size: 13px;">Copy</button>
+                        </div>
+                        <br>
+                        <p class="card-text p-y-1">{{.VoteDescription}}</p>
+                        <a href="{{.VoteID}}" class="card-link">Manage</a>
+                        <a href="/electivote/delete-vote-page/{{.VoteID}}" class="card-link">Delete Vote</a>
                       </div>
-                      <br>
-                      <p class="card-text p-y-1">{{.VoteDescription}}</p>
-                      <a href="{{.VoteID}}" class="card-link">Manage</a>
-                      <a href="/electivote/delete-vote-page/{{.VoteID}}" class="card-link">Delete Vote</a>
                     </div>
                   </div>
-                </div>
-              {{end}}
-            </div><br>
+                {{end}}
+              </div><br>
+            </div>
           </div>
+        {{else}}
+        <br><br><br><br><br><br>
+        <div class="text-center">
+          <h3 class="text-center card-subtitle text-muted">No Votes....</h3>
         </div>
+        {{end}}
     </div>
-    <br><br><br><br><br>
+    <br><br><br>
     <div style="display: flex; justify-content: center; gap: 100px;">
       <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../home-page">Back</a>
+      <a data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 210px;" href="../create-vote-page">Create Vote</a>
   </div>
-    <br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const copyButtons = document.querySelectorAll('.copy-button');

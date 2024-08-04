@@ -148,9 +148,21 @@ func ViewManageVotePage(c *gin.Context) {
 			"/electivote/manage-vote-page/",
 		)
 	}
+
+	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
 	context := gin.H {
 		"title": "Manage Vote",
 		"voteData": voteData,
+		"candidates": candidates,
 	}
 	c.HTML(
 		http.StatusOK,
