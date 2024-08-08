@@ -29,7 +29,7 @@
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="../profile-page">Profile</a>
+                <a class="nav-link active" aria-current="page" href="" style="font-weight: 700; color: #007bff;">Profile</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="../logout">Logout</a>
@@ -41,59 +41,33 @@
     <div class="container">
         <div class="row justify-content-center" style="margin-top: 100px;">
             <div style="display: flex; flex-direction: column; justify-content: center; width: 60%; margin-top: 60px">
-                <h1 class="text-center">Manage Vote</h1>
+                <h1 class="text-center">Manage Candidate</h1>
             </div>
             <form style="display: flex; flex-direction: column; justify-content: center; width: 530px; margin-top: 60px" method="post" enctype="multipart/form-data">
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <div data-mdb-input-init class="form-outline mb-4">
-                        <label for="voteTitle">*Vote Title</label>
-                        <input type="text" class="form-control"
-                        id="voteTitle"
-                        name="voteTitle"
-                        value="{{.voteData.VoteTitle}}">
-                        {{if .voteTitleErr}}
-                            <p style="color: red;">{{.voteTitleErr}}</p>
-                        {{end}}
-                    </div>
-                </div>   
-                <div data-mdb-input-init class="form-outline mb-4">
-                    <label for="voteDesc">*Vote Description</label>
-                    <textarea name="voteDesc" id="voteDesc" class="form-control" rows="5" >{{.voteData.VoteDescription}}</textarea>
+                    <label for="candidateName">*Candidate Name</label>
+                    <input type="text"
+                    id="candidateName"
+                    name="candidateName"
+                    class="form-control"
+                    placeholder="Enter Candidate Name"
+                    value="{{.candidateData.CandidateName}}"
+                    required>
+                    {{if .candidateNameErr}}
+                        <p style="color: red;">{{.candidateNameErr}}</p>
+                    {{end}}
                 </div>
-                <label for="candidates">*Candidates</label>
-                {{range .candidates}}
-                    <div class="row d-flex justify-content-center">
-                      <div class="col col-md-9 col-lg-7 col-xl-6" style="width: 100%;">
-                        <div class="card" style="border-radius: 15px;">
-                          <div class="card-body p-4">
-                            <div class="d-flex">
-                              <div class="flex-shrink-0">
-                                <img src="/images/{{.CandidatePicture}}"
-                                  alt="Generic placeholder image" class="img-fluid" style="width: 180px; border-radius: 10px;">
-                              </div>
-                              <div class="flex-grow-1 ms-3">
-                                <h5 class="mb-1">{{.CandidateName}}</h5>
-                                <p class="mb-2 pb-1">{{.CandidateDescription}}</p>
-                                <div class="d-flex pt-1">
-                                  <a href="/electivote/delete-candidate-page/{{.VoteId}}/{{.CandidateID}}" class="btn btn-outline-danger me-1 flex-grow-1">Delete</a>
-                                  <a class="btn btn-outline-primary me-1 flex-grow-1"
-                                  href="/electivote/manage-candidate-page/{{.VoteId}}/{{.CandidateID}}">Manage</a>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <br>
-                {{end}}
-                <br>
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <a href="/electivote/add-candidate-page/{{.voteData.VoteID}}" class="form-control btn btn-success" style="text-decoration: none; display: flex; justify-content: center;"><i data-feather="plus" ></i> Add Candidate</a>
+                    <label for="candidateDesc">*Candidate Description</label>
+                    <textarea name="candidateDesc" id="candidateDesc" class="form-control" rows="5" placeholder="Enter Candidate Description" >{{.candidateData.CandidateDescription}}</textarea>
                 </div>
-                <br><br><br>
+                <div data-mdb-input-init class="form-outline mb-4">
+                    <label for="candidatePicture">*Candidate Picture</label>
+                    <input type="file" id="candidatePicture" name="candidatePicture"
+                    class="form-control">
+                </div>
                 <div style="display: flex; justify-content: center; gap: 100px;">
-                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../">Back</a>
+                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="/electivote/manage-vote-page/{{.voteID}}">Cancel</a>
                     <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Update</button>
                 </div>
             </form>
