@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/AndreanDjabbar/ElectiVote/internal/factories"
@@ -139,31 +140,53 @@ func ViewManageVotePage(c *gin.Context) {
 		)
 		return
 	}
-	voteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
-	if err != nil {
+
+	var wg sync.WaitGroup
+	var voteData models.Vote
+	var candidates []models.Candidate
+	var voteDataErr error
+	var candidatesErr error
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		voteData, voteDataErr = repositories.GetVoteDataByVoteID(uint(voteID))
+	}()
+
+	go func() {
+		defer wg.Done()
+		candidates, candidatesErr = repositories.GetCandidatesByVoteID(uint(voteID))
+	}()
+
+	wg.Wait()
+
+	if voteDataErr != nil {
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
-			err.Error(),
+			voteDataErr.Error(),
 			"/electivote/manage-vote-page/",
 		)
+		return
 	}
 
-	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
-	if err != nil {
+	if candidatesErr != nil {
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
-			err.Error(),
+			candidatesErr.Error(),
 			"/electivote/manage-vote-page/",
 		)
+		return
 	}
 
-	context := gin.H {
-		"title": "Manage Vote",
-		"voteData": voteData,
+	context := gin.H{
+		"title":      "Manage Vote",
+		"voteData":   voteData,
 		"candidates": candidates,
 	}
+
 	c.HTML(
 		http.StatusOK,
 		"manageVote.html",
