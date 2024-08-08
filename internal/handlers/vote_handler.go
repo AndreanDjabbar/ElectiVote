@@ -132,7 +132,7 @@ func ViewManageVotePage(c *gin.Context) {
 
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
-	if !repositories.IsValidModerator(username, uint(voteID)) {
+	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -182,7 +182,7 @@ func ManageVotePage(c *gin.Context) {
 
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
-	if !repositories.IsValidModerator(username, uint(voteID)) {
+	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -250,7 +250,7 @@ func ViewDeleteVotePage(c *gin.Context) {
 
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
-	if !repositories.IsValidModerator(username, uint(voteID)) {
+	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -290,7 +290,7 @@ func DeleteVotePage(c *gin.Context) {
 
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
-	if !repositories.IsValidModerator(username, uint(voteID)) {
+	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
