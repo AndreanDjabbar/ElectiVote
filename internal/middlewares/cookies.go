@@ -1,13 +1,14 @@
 package middlewares
 
 import (
+	"os"
 	"time"
 
 	"github.com/AndreanDjabbar/ElectiVote/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
-var cookieKey string = "cookie"
+var cookieKey string = os.Getenv("COOKIE_KEY")
 
 func SetCookies(c *gin.Context, username string) {
 	token, err := utils.GenerateSecureToken(username)
