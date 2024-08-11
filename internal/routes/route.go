@@ -36,6 +36,12 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.GET("home-page/", handlers.ViewHomePage)
 	}
 	{
+		mainRouter.GET("forgot-password-page/", handlers.ViewForgotPasswordPage)
+		mainRouter.POST("forgot-password-page/", handlers.ForgotPasswordPage)
+		mainRouter.GET("reset-password-page/:token/", handlers.ViewResetPasswordPage)
+		mainRouter.POST("reset-password-page/:token/", handlers.ResetPasswordPage)
+	}
+	{
 		mainRouter.GET("profile-page/", handlers.ViewProfilePage)
 		mainRouter.GET("edit-profile-page/", handlers.ViewEditProfilePage)
 		mainRouter.POST("edit-profile-page/", handlers.EditProfilePage)
