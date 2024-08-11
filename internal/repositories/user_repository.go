@@ -55,3 +55,21 @@ func GetUserEmailByUsername(username string) (string, error) {
 	}
 	return user.Email, nil
 }
+
+func GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+	err := db.DB.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func UpdatePasswordByEmail(email, passwordHashed string) (models.User, error) {
+	var user models.User
+	err := db.DB.Model(&user).Where("email = ?", email).Update("password", passwordHashed).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
