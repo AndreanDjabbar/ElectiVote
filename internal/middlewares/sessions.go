@@ -1,11 +1,13 @@
 package middlewares
 
 import (
+	"os"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-var sessionKey string = "session"
+var sessionKey string = os.Getenv("SESSION_KEY")
 
 func SetSession(c *gin.Context, value string) {
 	session := sessions.Default(c)

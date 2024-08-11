@@ -11,19 +11,21 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
 	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var secretKey []byte = []byte(os.Getenv("SECRET_KEY"))
+var SecretKey []byte = []byte(os.Getenv("SECRET_KEY"))
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func GenerateSecureToken(username string) (string, error) {
 	timestamp := time.Now().Unix()
 	data := fmt.Sprintf("%s:%d", username, timestamp)
-	h := hmac.New(sha256.New, []byte(secretKey))
+	h := hmac.New(sha256.New, []byte(SecretKey))
 	h.Write([]byte(data))
 	signature := hex.EncodeToString(h.Sum(nil))
 	return fmt.Sprintf("%s:%s", data, signature), nil
@@ -36,7 +38,7 @@ func ExtractUsername(token string) (string, error) {
 	}
 
 	data := fmt.Sprintf("%s:%s", parts[0], parts[1])
-	h := hmac.New(sha256.New, []byte(secretKey))
+	h := hmac.New(sha256.New, []byte(SecretKey))
 	h.Write([]byte(data))
 	expectedSignature := hex.EncodeToString(h.Sum(nil))
 
@@ -190,4 +192,17 @@ func GenerateVoteCode() string {
 		voteCode = voteCodeMaker()
 	}
 	return voteCode
+}
+
+func GenerateResetToken(userEmail string) (string, error) {
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "email": userEmail,
+        "exp":   time.Now().Add(1 * time.Hour).Unix(),
+    })
+
+    tokenString, err := token.SignedString(SecretKey)
+    if err != nil {
+        return "", err
+    }
+    return tokenString, nil
 }
