@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -143,7 +144,6 @@ func ViewForgotPasswordPage(c *gin.Context) {
 func sendResetPasswordEmail(email, token string) error {
 	from := os.Getenv("EMAIL_SENDER")
 	password := os.Getenv("EMAIL_PASSWORD")
-	fmt.Println(from, password)
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
 
@@ -188,12 +188,10 @@ func verifyResetToken(tokenString string) (string, error) {
 
 func ForgotPasswordPage(c *gin.Context) {
 	if middlewares.IsLogged(c) {
-		c.Redirect(
-			http.StatusFound,
-			"/electivote/home-page/",
-		)
+		c.Redirect(http.StatusFound, "/electivote/home-page/")
 		return
 	}
+
 	email := c.PostForm("email")
 	emailErr := ""
 	if len(email) == 0 {
@@ -210,46 +208,29 @@ func ForgotPasswordPage(c *gin.Context) {
 	}
 
 	if emailErr != "" {
-		context := gin.H {
-			"title": "Forgot Password",
+		context := gin.H{
+			"title":    "Forgot Password",
 			"emailErr": emailErr,
-			"email": email,
+			"email":    email,
 		}
-		c.HTML(
-			http.StatusOK,
-			"forgotPassword.html",
-			context,
-		)
+		c.HTML(http.StatusOK, "forgotPassword.html", context)
 		return
 	}
 
 	tokenString, err := utils.GenerateResetToken(email)
 	if err != nil {
-		utils.RenderError(
-			c,
-			http.StatusInternalServerError,
-			"Internal Server Error",
-			"/electivote/home-page/",
-		)
+		utils.RenderError(c, http.StatusInternalServerError, "Internal Server Error", "/electivote/home-page/")
 		return
 	}
 	
-	err = sendResetPasswordEmail(email, tokenString)
-	fmt.Println(err)
-	if err != nil {
-		utils.RenderError(
-			c,
-			http.StatusInternalServerError,
-			"Internal Server Error",
-			"electivote/home-page/",
-		)
-		return
-	}
+	go func() {
+		err = sendResetPasswordEmail(email, tokenString)
+		if err != nil {
+			log.Printf("Error sending email: %v", err)
+		}
+	}()
 
-	c.Redirect(
-		http.StatusFound,
-		"/electivote/login-page/",
-	)
+	c.Redirect(http.StatusFound, "/electivote/login-page/")
 }
 
 func ViewResetPasswordPage(c *gin.Context) {
