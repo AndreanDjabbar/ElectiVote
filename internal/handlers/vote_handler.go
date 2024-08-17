@@ -336,3 +336,102 @@ func DeleteVotePage(c *gin.Context) {
 		"/electivote/manage-vote-page/",
 	)
 }
+
+func ViewJoinVotePage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+
+	context := gin.H {
+		"title": "Join Vote",
+	}
+	c.HTML(
+		http.StatusOK,
+		"joinVote.html",
+		context,
+	)
+}
+
+func JoinVotePage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	voteCodeErr := ""
+	voteCode := c.PostForm("voteCode")
+
+	if len(voteCode) != 6 {
+		voteCodeErr = "Vote code must be 6 characters"
+	}
+
+	_, err := repositories.GetVoteByVoteCode(voteCode)
+	if len(voteCode) == 6 && err != nil {
+		voteCodeErr = "Vote code not found"
+	}
+
+	if voteCodeErr != "" {
+		context := gin.H {
+			"title": "Join Vote",
+			"voteCode": voteCode,
+			"voteCodeErr": voteCodeErr,
+		}
+		c.HTML(
+			http.StatusOK,
+			"joinVote.html",
+			context,
+		)
+		return
+	}
+	c.Redirect(
+		http.StatusFound,
+		"/electivote/vote-page/" + voteCode,
+	)
+}
+
+func ViewVotePage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	voteCode := c.Param("voteCode")
+	voteID, err := repositories.GetVoteIDByVoteCode(voteCode)
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+
+	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+	
+	context := gin.H {
+		"title": "Vote",
+		"candidates": candidates,
+		"voteCode": voteCode,
+	}
+	c.HTML(
+		http.StatusOK,
+		"vote.html",
+		context,
+	)
+}	

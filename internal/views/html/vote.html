@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<style>
+    :root {
+  --gradient: linear-gradient(to left top, #DD2476 10%, #FF512F 90%) !important;
+    }
+
+    body {
+    background: white !important;
+    }
+
+    .card {
+    background: #222;
+    color: rgba(250, 250, 250, 0.8);
+    margin-bottom: 2rem;
+    }
+
+    img {
+        width: 240px;
+        height: 220px;
+    }
+    
+</style>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">ElectiVote</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="../profile-page">Profile</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="../logout">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row justify-content-center" style="margin-top: 100px;">
+            <div style="display: flex; flex-direction: column; justify-content: center; width: 60%; margin-top: 30px; margin-bottom: 60px;">
+                <h1 class="text-center">Candidates</h1>
+            </div>
+        </div>
+        <div class="container mx-auto mt-4">
+            <form action="" method="post">
+            <div class="row" style="margin-left: 80px;">
+                    {{range .candidates}}
+                    <div class="col-md-4">
+                        <div class="card" style="width: 18rem;">
+                            <img src="/images/{{.CandidatePicture}}" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">{{.CandidateName}}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">None</h6>
+                                <p class="card-text">{{.CandidateDescription}}</p>
+                            </div>
+                            <br><br>
+                            <div class="text-center bg-success" style="display: flex; justify-content: center; gap: 5px; padding: 10px;">
+                                <input type="radio" name="voted" id="voted"
+                                    style="width: 30px; height: 30px;" value="{{.CandidateID}}">
+                            </div>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+                <br><br><br>
+                <div style="display: flex; justify-content: center; gap: 100px;">
+                    <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="/electivote/join-vote-page/">Cancel</a>
+                    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Submit</button>
+                </div>
+            </form>
+        </div>
+        <br><br><br><br><br>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

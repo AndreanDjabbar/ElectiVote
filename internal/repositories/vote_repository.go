@@ -93,3 +93,21 @@ func DeleteVote(voteID uint) error {
 	}
 	return nil
 }
+
+func GetVoteByVoteCode(voteCode string) (models.Vote, error) {
+	vote := models.Vote{}
+	err := db.DB.Where("BINARY vote_code = ?", voteCode).First(&vote).Error
+	if err != nil {
+		return vote, err
+	}
+	return vote, nil
+}
+
+func GetVoteIDByVoteCode(voteCode string) (uint, error) {
+	vote := models.Vote{}
+	err := db.DB.Where("BINARY vote_code = ?", voteCode).First(&vote).Error
+	if err != nil {
+		return 0, err
+	}
+	return vote.VoteID, nil
+}
