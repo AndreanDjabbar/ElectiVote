@@ -63,4 +63,10 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.GET("delete-candidate-page/:voteID/:candidateID/", handlers.ViewDeleteCandidatePage)
 		mainRouter.GET("delete-candidate/:voteID/:candidateID/", handlers.DeleteCandidatePage)
 	}
+	{
+		mainRouter.GET("join-vote-page/", handlers.ViewJoinVotePage)
+		mainRouter.POST("join-vote-page/", handlers.JoinVotePage)
+		mainRouter.GET("vote-page/:voteCode/", handlers.ViewVotePage)
+		mainRouter.POST("vote-page/:voteCode/", handlers.VotePage)
+	}
 }
