@@ -366,12 +366,27 @@ func JoinVotePage(c *gin.Context) {
 	}
 	voteCodeErr := ""
 	voteCode := c.PostForm("voteCode")
+	username := middlewares.GetUserData(c)
+	userID, err := repositories.GetUserIdByUsername(username)
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/join-vote-page/",
+		)
+		return
+	}
+
+	if repositories.IsVoted(uint(userID), voteCode) {
+		voteCodeErr = "You already voted in this vote"
+	}
 
 	if len(voteCode) != 6 {
 		voteCodeErr = "Vote code must be 6 characters"
 	}
 
-	_, err := repositories.GetVoteByVoteCode(voteCode)
+	_, err = repositories.GetVoteByVoteCode(voteCode)
 	if len(voteCode) == 6 && err != nil {
 		voteCodeErr = "Vote code not found"
 	}
@@ -435,3 +450,89 @@ func ViewVotePage(c *gin.Context) {
 		context,
 	)
 }	
+
+func VotePage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	votedErr := ""
+	voted := c.PostForm("voted")
+	voteCode := c.Param("voteCode")
+	voteID, err := repositories.GetVoteIDByVoteCode(voteCode)
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+
+	username := middlewares.GetUserData(c)
+	userID, err := repositories.GetUserIdByUsername(username)
+
+	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+
+	if voted == "" {
+		votedErr = "Please select a candidate"
+	}
+
+	if votedErr != "" {
+		context := gin.H {
+			"title": "Vote",
+			"votedErr": votedErr,
+			"voteCode": voteCode,
+			"voted":voted,
+			"candidates": candidates,
+		}
+		c.HTML(
+			http.StatusOK,
+			"vote.html",
+			context,
+		)
+		return
+	}
+
+	votedInt, _ := strconv.Atoi(voted)
+	votedTime := models.CustomTime{Time: time.Now()}
+
+	votedRecord := factories.VoteRecordFactory(uint(voteID), uint(userID), uint(votedInt), votedTime)
+	_, err = repositories.CreateVoteRecord(votedRecord)
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+		return
+	}
+
+	err = repositories.IncrementCandidateVote(uint(votedInt))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+		return
+	}
+
+	c.Redirect(
+		http.StatusFound,
+		"/electivote/home-page/",
+	)
+}

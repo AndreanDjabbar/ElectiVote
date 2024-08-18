@@ -55,6 +55,7 @@
                 <h1 class="text-center">Candidates</h1>
             </div>
         </div>
+        {{if .candidates}}
         <div class="container mx-auto mt-4">
             <form action="" method="post">
             <div class="row" style="margin-left: 80px;">
@@ -70,12 +71,19 @@
                             <br><br>
                             <div class="text-center bg-success" style="display: flex; justify-content: center; gap: 5px; padding: 10px;">
                                 <input type="radio" name="voted" id="voted"
-                                    style="width: 30px; height: 30px;" value="{{.CandidateID}}">
+                                    style="width: 30px; height: 30px;" value="{{.CandidateID}}"
+                                    >
                             </div>
                         </div>
                     </div>
                     {{end}}
                 </div>
+                <br><br><br>
+                {{if .votedErr}}
+                  <div class="text-center">
+                    <h3 style="color: red;">{{.votedErr}}</h3>
+                  </div>
+                {{end}}
                 <br><br><br>
                 <div style="display: flex; justify-content: center; gap: 100px;">
                     <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="/electivote/join-vote-page/">Cancel</a>
@@ -83,6 +91,14 @@
                 </div>
             </form>
         </div>
+        {{else}}
+        <br><br><br><br><br><br>
+        <div class="text-center">
+          <h3 class="text-center card-subtitle text-muted">No Candidates....</h3>
+          <br><br><br><br><br><br>
+          <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="/electivote/join-vote-page/">Back</a>
+        </div>
+        {{end}}
         <br><br><br><br><br>
     </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
