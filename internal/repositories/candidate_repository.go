@@ -56,3 +56,14 @@ func DeleteCandidate(candidateID uint) error {
 	err := db.DB.Where("candidate_id = ?", candidateID).Delete(&models.Candidate{}).Error
 	return err
 }
+
+func IncrementCandidateVote(candidateID uint) error {
+	candidate := models.Candidate{}
+	err := db.DB.Where("candidate_id = ?", candidateID).Find(&candidate).Error
+	if err != nil {
+		return err
+	}
+	candidate.TotalVotes += 1
+	err = db.DB.Model(&models.Candidate{}).Where("candidate_id = ?", candidateID).Updates(&candidate).Error
+	return err
+}
