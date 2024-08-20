@@ -90,8 +90,10 @@
                 <br>
                 <div data-mdb-input-init class="form-outline mb-4">
                     <a href="/electivote/add-candidate-page/{{.voteData.VoteID}}" class="form-control btn btn-success" style="text-decoration: none; display: flex; justify-content: center;"><i data-feather="plus" ></i> Add Candidate</a>
+                    <br>
+                    <a href="/electivote/vote-result-page/{{.voteData.VoteID}}" class="form-control btn btn-dark" style="text-decoration: none; display: flex; justify-content: center;"><i data-feather="bar-chart-2" ></i>  Vote Result</a>
                 </div>
-                <br><br><br>
+                <br><br><br><br>
                 <div style="display: flex; justify-content: center; gap: 100px;">
                     <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="../">Back</a>
                     <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" style="width: 200px;">Update</button>
