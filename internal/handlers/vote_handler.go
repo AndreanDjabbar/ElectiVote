@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"sync"
@@ -429,6 +430,16 @@ func ViewVotePage(c *gin.Context) {
 		)
 	}
 
+	VoteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+
 	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
 	if err != nil {
 		utils.RenderError(
@@ -442,6 +453,8 @@ func ViewVotePage(c *gin.Context) {
 	context := gin.H {
 		"title": "Vote",
 		"candidates": candidates,
+		"voteTitle": VoteData.VoteTitle,
+		"voteDescription": VoteData.VoteDescription,
 		"voteCode": voteCode,
 	}
 	c.HTML(
@@ -463,6 +476,16 @@ func VotePage(c *gin.Context) {
 	voted := c.PostForm("voted")
 	voteCode := c.Param("voteCode")
 	voteID, err := repositories.GetVoteIDByVoteCode(voteCode)
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+
+	VoteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
 	if err != nil {
 		utils.RenderError(
 			c,
@@ -495,6 +518,8 @@ func VotePage(c *gin.Context) {
 			"votedErr": votedErr,
 			"voteCode": voteCode,
 			"voted":voted,
+			"voteTitle": VoteData.VoteTitle,
+			"voteDescription": VoteData.VoteDescription,
 			"candidates": candidates,
 		}
 		c.HTML(
@@ -534,5 +559,76 @@ func VotePage(c *gin.Context) {
 	c.Redirect(
 		http.StatusFound,
 		"/electivote/home-page/",
+	)
+}
+
+func ViewVoteResultPage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+
+	username := middlewares.GetUserData(c)
+	voteID, _ := strconv.Atoi(c.Param("voteID"))
+	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/home-page/",
+		)
+		return
+	}
+
+	voteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
+	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
+	candidatesJson, err := json.Marshal(candidates)
+	if err != nil {
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
+	isExist := true
+
+	if len(candidates) == 0 {
+		isExist = false
+	}
+
+	context := gin.H {
+		"title": "Vote Result",
+		"voteID": voteID,
+		"voteData": voteData,
+		"candidates": candidates,
+		"candidatesJson": string(candidatesJson),
+		"isExist": isExist,
+		"voteTitle": voteData.VoteTitle,
+	}
+	c.HTML(
+		http.StatusOK,
+		"voteResult.html",
+		context,
 	)
 }

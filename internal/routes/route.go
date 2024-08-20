@@ -68,5 +68,6 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.POST("join-vote-page/", handlers.JoinVotePage)
 		mainRouter.GET("vote-page/:voteCode/", handlers.ViewVotePage)
 		mainRouter.POST("vote-page/:voteCode/", handlers.VotePage)
+		mainRouter.GET("vote-result-page/:voteID/", handlers.ViewVoteResultPage)
 	}
 }
