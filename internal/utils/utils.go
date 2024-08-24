@@ -50,7 +50,7 @@ func ExtractUsername(token string) (string, error) {
 }
 
 func IsValidEmail(email string) bool {
-	const emailPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.id)$`
+	const emailPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	re := regexp.MustCompile(emailPattern)
 	return re.MatchString(email)
 }
@@ -205,4 +205,37 @@ func GenerateResetToken(userEmail string) (string, error) {
         return "", err
     }
     return tokenString, nil
+}
+
+func GetEmailDomain(email string) string {
+	index := strings.LastIndex(email, "@")
+	if index == -1 {
+		return ""
+	}
+	return email[index+1:]
+}
+
+func GetEmailProvider(emailDomain string) string {
+	providers := map[string]string{
+		"gmail.com": "smtp.gmail.com",
+		"yahoo.com": "smtp.yahoo.com",
+		"hotmail.com": "smtp-mail.outlook.com",
+		"outlook.com": "smtp-mail.outlook.com",
+	}
+	return providers[emailDomain]
+}
+
+func GenerateOTP() (string, error) {
+	const otpLength = 6
+	var otp string
+
+	for i := 0; i < otpLength; i++ {
+		num, err := rand.Int(rand.Reader, big.NewInt(10))
+		if err != nil {
+			return "", err
+		}
+		otp += num.String()
+	}
+
+	return otp, nil
 }
