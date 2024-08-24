@@ -70,4 +70,8 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.POST("vote-page/:voteCode/", handlers.VotePage)
 		mainRouter.GET("vote-result-page/:voteID/", handlers.ViewVoteResultPage)
 	}
+	{
+		mainRouter.GET("email-verification-page/", handlers.ViewVerifyEmailPage)
+		mainRouter.POST("email-verification-page/", handlers.VerifyEmailPage)
+	}
 }
