@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gin-contrib/sessions"
@@ -27,5 +28,25 @@ func GetSession(c *gin.Context) string {
 func DeleteSession(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Delete(sessionKey)
+	session.Save()
+}
+
+func SetRegisterSession(c *gin.Context, username, email, password, otp string) {
+	session := sessions.Default(c)
+	session.Set("username", username)
+	session.Set("email", email)
+	session.Set("password", password)
+	session.Set("otp", otp)
+	if err := session.Save(); err != nil {
+		fmt.Println("Error saving session: ", err)
+	}
+}
+
+func DeleteRegisterSession(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Delete("username")
+	session.Delete("email")
+	session.Delete("password")
+	session.Delete("otp")
 	session.Save()
 }
