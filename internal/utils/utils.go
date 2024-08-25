@@ -17,6 +17,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/gomail.v2"
 )
 
 var SecretKey []byte = []byte(os.Getenv("SECRET_KEY"))
@@ -238,4 +239,46 @@ func GenerateOTP() (string, error) {
 	}
 
 	return otp, nil
+}
+
+func SendEmail(email, emailProvider, body string, subject string) error {
+    services := map[string]struct {
+        from     string
+        password string
+        host     string
+        port     int
+    }{
+        "smtp.gmail.com": {
+            from:     os.Getenv("GMAIL_EMAIL"),
+            password: os.Getenv("GMAIL_PASSWORD"),
+            host:     "smtp.gmail.com",
+            port:     587,
+        },
+        "smtp-mail.outlook.com": {
+            from:     os.Getenv("OUTLOOK_EMAIL"),
+            password: os.Getenv("OUTLOOK_PASSWORD"),
+            host:     "smtp-mail.outlook.com",
+            port:     587,
+        },
+    }
+
+    service, exists := services[emailProvider]
+    if !exists {
+        return fmt.Errorf("unsupported email provider: %s", emailProvider)
+    }
+
+    m := gomail.NewMessage()
+    m.SetHeader("From", service.from)
+    m.SetHeader("To", email)
+    m.SetHeader("Subject", subject)
+    m.SetBody("text/html", body)
+
+    
+    d := gomail.NewDialer(service.host, service.port, service.from, service.password)
+
+    if err := d.DialAndSend(m); err != nil {
+        return fmt.Errorf("failed to send email: %v", err)
+    }
+
+    return nil
 }
