@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/smtp"
-	"os"
 	"sync"
 
 	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
@@ -141,33 +139,6 @@ func ViewForgotPasswordPage(c *gin.Context) {
 	)
 }
 
-func sendResetPasswordEmail(email, token string) error {
-	from := os.Getenv("EMAIL_SENDER")
-	password := os.Getenv("EMAIL_PASSWORD")
-	smtpHost := "smtp.gmail.com"
-	smtpPort := "587"
-
-	resetURL := fmt.Sprintf("http://localhost:8080/electivote/reset-password-page/%s", token)
-
-	subject := "Subject: Reset your password\n"
-	body := fmt.Sprintf("To reset your password, please click the following link:\n\n%s\n", resetURL)
-	message := []byte(subject + "\n" + body)
-
-	auth := smtp.PlainAuth("", from, password, smtpHost)
-
-	err := smtp.SendMail(
-		fmt.Sprintf("%s:%s", smtpHost, smtpPort),
-		auth,
-		from,
-		[]string{email},
-		message,
-	)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func verifyResetToken(tokenString string) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return utils.SecretKey, nil
@@ -222,9 +193,55 @@ func ForgotPasswordPage(c *gin.Context) {
 		utils.RenderError(c, http.StatusInternalServerError, "Internal Server Error", "/electivote/home-page/")
 		return
 	}
-	
+	emailDomain := utils.GetEmailDomain(email)
+	emailProvider := utils.GetEmailProvider(emailDomain)
+	resetURL := fmt.Sprintf("http://localhost:8080/electivote/reset-password-page/%s", tokenString)
+	body := fmt.Sprintf(`
+    <html>
+    <head>
+        <style>
+            .email-container {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            .email-header {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+            .email-content {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+            .email-link {
+                display: inline-block;
+                padding: 10px 15px;
+                background-color: #4CAF50;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="email-header">Reset Password</div>
+            <div class="email-content">
+                <p>To reset your password, please click the following link:</p>
+                <p>
+                    <a href="%s" class="email-link">Reset Your Password</a>
+                </p>
+                <p>If you did not request a password reset, please ignore this email.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+`, resetURL)
+	subject := "Reset your password"
+
 	go func() {
-		err = sendResetPasswordEmail(email, tokenString)
+		err = utils.SendEmail(email, emailProvider, body, subject)
 		if err != nil {
 			log.Printf("Error sending email: %v", err)
 		}
