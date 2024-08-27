@@ -3,6 +3,7 @@ package middlewares
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -37,6 +38,7 @@ func SetRegisterSession(c *gin.Context, username, email, password, otp string) {
 	session.Set("email", email)
 	session.Set("password", password)
 	session.Set("otp", otp)
+	session.Set("created_at", time.Now().Unix())
 	if err := session.Save(); err != nil {
 		fmt.Println("Error saving session: ", err)
 	}

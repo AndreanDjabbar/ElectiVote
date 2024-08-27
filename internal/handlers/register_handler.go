@@ -3,6 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
+
 	"github.com/AndreanDjabbar/ElectiVote/internal/factories"
 	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
 	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
@@ -72,13 +74,19 @@ func RegisterPage(c *gin.Context) {
 				font-weight: bold;
 				color: #000000;
 			}
+			.note {
+				font-size: 14px;
+				color: #555555;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
 			<p>Hello,</p>
 			<p>Your OTP Code is: <span class="otp-code">` + otp + `</span></p>
-			<p>Please use this code to verify your email address.</p>
+			<p class="note">Please use this code to verify your email address. <strong>Note:</strong> The OTP is valid for <strong>5 minutes</strong> from the time it was generated.</p>
+			<p>If you did not request this verification, please ignore this email.</p>
+			<p>Thank you!</p>
 		</div>
 	</body>
 	</html>
@@ -190,7 +198,9 @@ func VerifyEmailPage(c *gin.Context) {
 	email := session.Get("email")
 	password := session.Get("password")
 	otp := session.Get("otp")
+	otpCreatedAt := session.Get("created_at")
 	otpInput := c.PostForm("otp")
+	expirationTime := 5 * 60
 
 	if otp == nil {
 		c.Redirect(
@@ -211,6 +221,16 @@ func VerifyEmailPage(c *gin.Context) {
 	
 	if otpInput != "" && (len(otpInput) != 6) {
 		otpErr = "OTP must be 6 characters"
+	}
+
+	if time.Now().Unix() > otpCreatedAt.(int64) + int64(expirationTime) {
+		middlewares.DeleteRegisterSession(c)
+		c.HTML(
+			http.StatusOK,
+			"message.html",
+			nil,
+		)
+		return
 	}
 
 	if otpErr != "" {

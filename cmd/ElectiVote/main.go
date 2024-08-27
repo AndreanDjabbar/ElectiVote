@@ -14,23 +14,21 @@ func init() {
 	db.ConnectToDatabase()
 }
 
-var SessionKey string = "session"
-
 func main() {
 	router := gin.Default()
-	store := cookie.NewStore([]byte("secret"))
-	{
-		router.LoadHTMLGlob("internal/views/html/*.html")
-		router.Static("/images", "internal/assets/images")
-		router.MaxMultipartMemory = 8 << 20
-		router.Use(sessions.Sessions(SessionKey, store))
-		store.Options(sessions.Options{
-			MaxAge: 0,
-			HttpOnly: true,
-			Path: "/",
-			Secure: false,
-		})
-	}
+	router.LoadHTMLGlob("internal/views/html/*.html")
+	router.Static("/images", "internal/assets/images")
+	router.MaxMultipartMemory = 8 << 20
+
+	mainStore := cookie.NewStore([]byte("main"))
+	mainStore.Options(sessions.Options{
+		MaxAge: 0,
+		HttpOnly: true,
+		Path: "/",
+		Secure: false,
+	})
+
+	router.Use(sessions.Sessions("mainSession", mainStore))
 	port := os.Getenv("PORT")
 	host := os.Getenv("HOST")
 	routes.SetUpRoutes(router)
