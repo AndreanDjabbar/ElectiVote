@@ -5,8 +5,11 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math/big"
+	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -98,7 +101,7 @@ func ValidateRegisterInput(username, password, password2, email string) (string,
 	}
 
 	if password2 == "" {
-		passwordErr = "Password Confirmation must be filled"
+		password2Err = "Password Confirmation must be filled"
 	}
 
 	if password2 != "" && password != password2 {
@@ -281,4 +284,23 @@ func SendEmail(email, emailProvider, body string, subject string) error {
     }
 
     return nil
+}
+
+func IsValidReCAPTCHA(c *gin.Context) bool {
+	recaptchaResponse := c.PostForm("g-recaptcha-response")
+	secretKey := os.Getenv("RECAPTCHA_SECRET_KEY")
+
+	resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify",
+		url.Values{"secret": {secretKey}, "response": {recaptchaResponse}})
+
+	if err != nil {
+		fmt.Println("Error verifying reCAPTCHA:", err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	return result["success"].(bool)
 }
