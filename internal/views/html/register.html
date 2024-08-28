@@ -16,48 +16,52 @@
                 <div data-mdb-input-init class="form-outline mb-4">
                     {{if .usernameErr}}
                     <input type="text" id="username" name="username" placeholder="Username"
-                    value="{{.username}}" class="form-control" />
+                    value="{{.username}}" class="form-control" required/>
                     <p style="color: red;">{{.usernameErr}}</p>
                     {{else}}
                     <input type="text" id="username" name="username" 
                     value="{{.username}}"
-                    placeholder="Username" class="form-control" />
+                    placeholder="Username" class="form-control" required/>
                     {{end}}
                 </div>   
                 <div data-mdb-input-init class="form-outline mb-4">
                     {{if .emailErr}}
                     <input type="text" id="email" name="email" placeholder="Email"
-                    value="{{.email}}" class="form-control" />
+                    value="{{.email}}" class="form-control" required/>
                     <p style="color: red;">{{.emailErr}}</p>
                     {{else}}
                     <input type="text" id="email" name="email" placeholder="Email"
-                    value="{{.email}}" class="form-control" />
+                    value="{{.email}}" class="form-control" required/>
                     {{end}}
                 </div>   
                 <div data-mdb-input-init class="form-outline mb-4">
                     {{if .passwordErr}}
                     <input type="password" id="password" name="password" placeholder="Password"
-                    value="{{.password}}" class="form-control"/>
+                    value="{{.password}}" class="form-control" required/>
                     <p style="color: red;">{{.passwordErr}}</p>
                     {{else}}
                     <input type="password" id="password" name="password" placeholder="Password"
-                    value="{{.password}}" class="form-control"/>
+                    value="{{.password}}" class="form-control" required/>
                     {{end}}
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
                     {{if .password2Err}}
                     <input type="password" id="password2" name="password2" placeholder="Password Confirmation"
-                    value="{{.password2}}" class="form-control"/>
+                    value="{{.password2}}" class="form-control" required/>
                     <p style="color: red;">{{.password2Err}}</p>
                     {{else}}
                     <input type="password" id="password2" name="password2" placeholder="Password Confirmation"
-                    value="{{.password2}}" class="form-control"/>
+                    value="{{.password2}}" class="form-control" required/>
                     {{end}}
                 </div>
-                <div class="row mb-4">
-                    <div class="col d-flex justify-content-center">
-        </div>
-    </div>
+                <div data-mdb-input-init class="form-outline mb-4" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    {{if .captchaErr}}
+                        <div class="g-recaptcha" data-sitekey="{{.siteKey}}"></div>
+                        <p style="color: red;" class="text-center">{{.captchaErr}}</p>
+                    {{else}}
+                        <div class="g-recaptcha" data-sitekey="{{.siteKey}}"></div>
+                    {{end}}
+                </div>
     <button  type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" >Sign up</button>
     <div class="text-center">
         <p>Already have an account? <a href="../login-page">Sign in</a></p>
@@ -65,6 +69,8 @@
 </form>
 </div>
 </div>
+<br><br><br><br><br><br>
+<script src="https://www.google.com/recaptcha/api.js?hl=en" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
@@ -21,9 +22,10 @@ func ViewLoginPage(c *gin.Context) {
 		)
 		return
 	}
-
+	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 	context := gin.H {
 		"title": "Login",
+		"siteKey": siteKey,
 	}
 	c.HTML(
 		http.StatusOK,
@@ -44,11 +46,13 @@ func LoginPage(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	remember := c.PostForm("remember")
+	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 
 	usernameErr, passwordErr := utils.ValidateLoginInput(username, password)
 	var usernameCheckErr, passwordCheckErr error
 	var wg sync.WaitGroup
 	var mu sync.Mutex
+	captchaErr := ""
 
 	if usernameErr == "" {
 		wg.Add(1)
@@ -84,7 +88,11 @@ func LoginPage(c *gin.Context) {
 		passwordErr = "Password is incorrect"
 	}
 
-	if usernameErr == "" && passwordErr == "" {
+	if !utils.IsValidReCAPTCHA(c) {
+		captchaErr = "Invalid ReCAPTCHA"
+	}
+
+	if usernameErr == "" && passwordErr == "" && captchaErr == "" {
 		if remember == "on" {
 			middlewares.SetCookies(c, username)
 		} else {
@@ -101,8 +109,10 @@ func LoginPage(c *gin.Context) {
 		"title": "Login",
 		"usernameErr": usernameErr,
 		"passwordErr": passwordErr,
+		"captchaErr": captchaErr,
 		"username": username,
 		"password": password,
+		"siteKey": siteKey,
 	}
 	c.HTML(
 		http.StatusOK,
