@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/AndreanDjabbar/ElectiVote/internal/factories"
@@ -21,9 +22,10 @@ func ViewRegisterPage(c *gin.Context) {
 		)
 		return
 	}
-
+	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 	context := gin.H {
 		"title": "Register",
+		"siteKey": siteKey,
 	}
 	c.HTML(
 		http.StatusOK,
@@ -45,9 +47,10 @@ func RegisterPage(c *gin.Context) {
 	password := c.PostForm("password")
 	password2 := c.PostForm("password2")
 	email := c.PostForm("email")
-
+	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 
 	usernameErr, passwordErr, password2Err, emailErr := utils.ValidateRegisterInput(username, password, password2, email)
+	captchaErr := ""
 
 	emailDomain := utils.GetEmailDomain(email)
 	emailProvider := utils.GetEmailProvider(emailDomain)
@@ -55,50 +58,54 @@ func RegisterPage(c *gin.Context) {
 	if err != nil {
 		emailErr = "Failed to generate OTP"
 	}
-	subject := "ElectiVote Email Verification"
-	body := `
-	<html>
-	<head>
-		<style>
-			.container {
-				font-family: Arial, sans-serif;
-				max-width: 600px;
-				margin: auto;
-				padding: 20px;
-				border: 1px solid #ddd;
-				border-radius: 10px;
-				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-			}
-			.otp-code {
-				font-size: 24px;
-				font-weight: bold;
-				color: #000000;
-			}
-			.note {
-				font-size: 14px;
-				color: #555555;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<p>Hello,</p>
-			<p>Your OTP Code is: <span class="otp-code">` + otp + `</span></p>
-			<p class="note">Please use this code to verify your email address. <strong>Note:</strong> The OTP is valid for <strong>5 minutes</strong> from the time it was generated.</p>
-			<p>If you did not request this verification, please ignore this email.</p>
-			<p>Thank you!</p>
-		</div>
-	</body>
-	</html>
-	`
 
-	if usernameErr == "" && passwordErr == "" && password2Err == "" && emailErr == "" {
+	if !utils.IsValidReCAPTCHA(c) {
+		captchaErr = "Invalid ReCAPTCHA"
+	}
+
+	if usernameErr == "" && passwordErr == "" && password2Err == "" && emailErr == "" && captchaErr == "" {
 		hashedPassword, hashErr := utils.HashPassword(password)
 		if hashErr != nil {
 			utils.RenderError(c, http.StatusInternalServerError, hashErr.Error(), "/electivote/register-page/")
 			return
 		}
 
+		subject := "ElectiVote Email Verification"
+		body := `
+		<html>
+		<head>
+			<style>
+				.container {
+					font-family: Arial, sans-serif;
+					max-width: 600px;
+					margin: auto;
+					padding: 20px;
+					border: 1px solid #ddd;
+					border-radius: 10px;
+					box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				}
+				.otp-code {
+					font-size: 24px;
+					font-weight: bold;
+					color: #000000;
+				}
+				.note {
+					font-size: 14px;
+					color: #555555;
+				}
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<p>Hello,</p>
+				<p>Your OTP Code is: <span class="otp-code">` + otp + `</span></p>
+				<p class="note">Please use this code to verify your email address. <strong>Note:</strong> The OTP is valid for <strong>5 minutes</strong> from the time it was generated.</p>
+				<p>If you did not request this verification, please ignore this email.</p>
+				<p>Thank you!</p>
+			</div>
+		</body>
+		</html>
+		`
 		go func() {
 			err = utils.SendEmail(email, emailProvider, body, subject)
 			if err != nil {
@@ -120,10 +127,12 @@ func RegisterPage(c *gin.Context) {
 		"passwordErr": passwordErr,
 		"password2Err": password2Err,
 		"emailErr":    emailErr,
+		"captchaErr":  captchaErr,
 		"username":    username,
 		"password":    password,
 		"password2":   password2,
-		"email":       email,
+		"siteKey":     siteKey,
+		"email":       email,	
 	}
 	c.HTML(
 		http.StatusOK,
