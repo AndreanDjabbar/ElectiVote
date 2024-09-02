@@ -2,3 +2,4 @@ internal/assets/images/*
 .air.toml
 tmp/
 .env
+logs/*
