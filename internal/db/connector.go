@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	"github.com/AndreanDjabbar/ElectiVote/config"
 	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -14,9 +14,10 @@ import (
 var DB *gorm.DB
 
 func ConnectToDatabase() {
+	logger := config.SetUpLogger()
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		logger.Error("Error loading .env file")
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
@@ -32,6 +33,7 @@ func ConnectToDatabase() {
 		&gorm.Config{},
 	)
 	if err != nil {
+		logger.Error("Error connecting to database", "error", err)
 		panic(err.Error())
 	}
 	database.AutoMigrate(
@@ -42,4 +44,5 @@ func ConnectToDatabase() {
 		&models.VoteRecord{},
 	)
 	DB = database
+	logger.Info("Database connected")
 }
