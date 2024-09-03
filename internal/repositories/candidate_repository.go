@@ -73,6 +73,7 @@ func UpdateCandidate(candidateID uint, candidate models.Candidate) (models.Candi
 }
 
 func DeleteCandidate(candidateID uint) error {
+	logger.Info("Candidate Repository - Delete Candidate")
 	err := db.DB.Where("candidate_id = ?", candidateID).Delete(&models.Candidate{}).Error
 	logger.Info("Candidate Repository - Delete Candidate")
 	return err
@@ -82,11 +83,13 @@ func IncrementCandidateVote(candidateID uint) error {
 	candidate := models.Candidate{}
 	err := db.DB.Where("candidate_id = ?", candidateID).Find(&candidate).Error
 	if err != nil {
-		logger.Warn(
+		logger.Error(
 			"Candidate Repository - Error Increment Candidate Vote",
+			"error", err,
 		)
 		return err
 	}
+	logger.Info("Candidate Repository - Increment Candidate Vote")
 	candidate.TotalVotes += 1
 	err = db.DB.Model(&models.Candidate{}).Where("candidate_id = ?", candidateID).Updates(&candidate).Error
 	logger.Info("Candidate Repository - Increment Candidate Vote")

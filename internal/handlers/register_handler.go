@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -15,13 +14,23 @@ import (
 )
 
 func ViewRegisterPage(c *gin.Context) {
+	logger.Info(
+		"ViewRegisterPage - Page Accessed",
+	)
 	if middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewRegisterPage - User Logged In",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
 		)
 		return
 	}
+	logger.Info(
+		"ViewRegisterPage - Rendering Page",
+	)
 	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 	context := gin.H {
 		"title": "Register",
@@ -35,7 +44,14 @@ func ViewRegisterPage(c *gin.Context) {
 }
 
 func RegisterPage(c *gin.Context) {
+	logger.Info(
+		"RegisterPage - Registering User",
+	)
 	if middlewares.IsLogged(c) {
+		logger.Warn(
+			"RegisterPage - User Logged In",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -56,16 +72,25 @@ func RegisterPage(c *gin.Context) {
 	emailProvider := utils.GetEmailProvider(emailDomain)
 	otp, err := utils.GenerateOTP()
 	if err != nil {
+		logger.Error(
+			"RegisterPage - Failed to generate OTP",
+		)
 		emailErr = "Failed to generate OTP"
 	}
 
 	if !utils.IsValidReCAPTCHA(c) {
+		logger.Warn(
+			"RegisterPage - Invalid ReCAPTCHA",
+		)
 		captchaErr = "Invalid ReCAPTCHA"
 	}
 
 	if usernameErr == "" && passwordErr == "" && password2Err == "" && emailErr == "" && captchaErr == "" {
 		hashedPassword, hashErr := utils.HashPassword(password)
 		if hashErr != nil {
+			logger.Error(
+				"RegisterPage - Failed to hash password",
+			)
 			utils.RenderError(c, http.StatusInternalServerError, hashErr.Error(), "/electivote/register-page/")
 			return
 		}
@@ -109,10 +134,15 @@ func RegisterPage(c *gin.Context) {
 		go func() {
 			err = utils.SendEmail(email, emailProvider, body, subject)
 			if err != nil {
-				fmt.Println("Failed to send email:", err)
+				logger.Error(
+					"RegisterPage - Failed to send email",
+				)
 			}
 		}()
-
+		logger.Info(
+			"RegisterPage - Email Sent",
+			"action", "redirecting to verify email page",
+		)
 		middlewares.SetRegisterSession(c, username, email, hashedPassword, otp)
 		c.Redirect(
 			http.StatusFound,
@@ -120,7 +150,9 @@ func RegisterPage(c *gin.Context) {
 		)
 		return
 	}
-
+	logger.Info(
+		"RegisterPage - Rendering Page",
+	)
 	context := gin.H{
 		"title":       "Register",
 		"usernameErr": usernameErr,
@@ -142,16 +174,25 @@ func RegisterPage(c *gin.Context) {
 }
 
 func registerUser(c *gin.Context, username string, password string, email string) {
+	logger.Info(
+		"RegisterUser - Registering User",
+	)
 	newUser := factories.CreateUser(username, password, email, "user")
 
 	_, err := repositories.RegisterUser(newUser)
 	if err != nil {
+		logger.Error(
+			"RegisterUser - Failed to register user",
+		)
 		utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
 		return
 	}
 
 	userID, err := repositories.GetUserIdByUsername(username)
 	if err != nil {
+		logger.Error(
+			"RegisterUser - Failed to get user ID",
+		)
 		utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
 		return
 	}
@@ -159,13 +200,26 @@ func registerUser(c *gin.Context, username string, password string, email string
 	newProfile := factories.CreateFirstProfile(userID)
 	_, err = repositories.CreateProfile(newProfile)
 	if err != nil {
+		logger.Error(
+			"RegisterUser - Failed to create profile",
+		)
 		utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
 		return
 	}
+	logger.Info(
+		"RegisterUser - User Registered",
+	)
 }
 
 func ViewVerifyEmailPage(c *gin.Context) {
+	logger.Info(
+		"ViewVerifyEmailPage - Page Accessed",
+	)
 	if middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewVerifyEmailPage - User Logged In",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -177,6 +231,9 @@ func ViewVerifyEmailPage(c *gin.Context) {
 	otp := session.Get("otp")
 
 	if otp == nil {
+		logger.Warn(
+			"ViewVerifyEmailPage - OTP Not Found",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/register-page/",
@@ -184,6 +241,9 @@ func ViewVerifyEmailPage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"ViewVerifyEmailPage - Rendering Page",
+	)
 	context := gin.H {
 		"title": "Verify Email",
 	}
@@ -195,7 +255,14 @@ func ViewVerifyEmailPage(c *gin.Context) {
 }
 
 func VerifyEmailPage(c *gin.Context) {
+	logger.Info(
+		"VerifyEmailPage - Verifying Email",
+	)
 	if middlewares.IsLogged(c) {
+		logger.Warn(
+			"VerifyEmailPage - User Logged In",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -212,6 +279,10 @@ func VerifyEmailPage(c *gin.Context) {
 	expirationTime := 5 * 60
 
 	if otp == nil {
+		logger.Warn(
+			"VerifyEmailPage - OTP Not Found",
+			"action", "redirecting to register page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/register-page/",
@@ -221,19 +292,31 @@ func VerifyEmailPage(c *gin.Context) {
 
 	otpErr := ""
 	if otpInput == "" {
+		logger.Warn(
+			"VerifyEmailPage - OTP Not Filled",
+		)
 		otpErr = "OTP must be filled"
 	}
 
 	if otpInput != otp {
+		logger.Warn(
+			"VerifyEmailPage - Invalid OTP",
+		)
 		otpErr = "Invalid OTP"
 	}
 	
 	if otpInput != "" && (len(otpInput) != 6) {
+		logger.Warn(
+			"VerifyEmailPage - Invalid OTP Length",
+		)
 		otpErr = "OTP must be 6 characters"
 	}
 
 	if time.Now().Unix() > otpCreatedAt.(int64) + int64(expirationTime) {
 		middlewares.DeleteRegisterSession(c)
+		logger.Warn(
+			"VerifyEmailPage - OTP Expired",
+		)
 		c.HTML(
 			http.StatusOK,
 			"message.html",
@@ -243,6 +326,9 @@ func VerifyEmailPage(c *gin.Context) {
 	}
 
 	if otpErr != "" {
+		logger.Info(
+			"VerifyEmailPage - Rendering Page",
+		)
 		context := gin.H{
 			"title": "Verify Email",
 			"otpErr": otpErr,
@@ -254,8 +340,15 @@ func VerifyEmailPage(c *gin.Context) {
 		)
 		return
 	}
+	logger.Info(
+		"VerifyEmailPage - OTP Verified",
+	)
 	registerUser(c, username.(string), password.(string), email.(string))
 	middlewares.DeleteRegisterSession(c)
+	logger.Info(
+		"VerifyEmailPage - User Registered",
+		"action", "redirecting to login page",
+	)
 	c.Redirect(
 		http.StatusFound,
 		"/electivote/login-page/",

@@ -7,7 +7,14 @@ import (
 )
 
 func ViewHomePage(c *gin.Context) {
+	logger.Info(
+		"ViewHomePage - Page Accessed",
+	)
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewHomePage - User Not Logged In",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -17,6 +24,9 @@ func ViewHomePage(c *gin.Context) {
 
 	dataUser := middlewares.GetUserData(c)
 
+	logger.Info(
+		"ViewHomePage - User Logged In",
+	)
 	context := gin.H {
 		"title": "Home",
 		"dataUser": dataUser,
