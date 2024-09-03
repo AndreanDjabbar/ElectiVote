@@ -16,7 +16,12 @@ import (
 )
 
 func ViewCreateVotePage(c *gin.Context) {
+	logger.Info("ViewCreateVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewCreateVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -24,6 +29,9 @@ func ViewCreateVotePage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"ViewCreateVotePage - rendering create vote page",
+	)
 	context := gin.H {
 		"title": "Create Vote",
 	}
@@ -35,7 +43,12 @@ func ViewCreateVotePage(c *gin.Context) {
 }
 
 func CreateVotePage(c *gin.Context) {
+	logger.Info("CreateVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"CreateVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -51,6 +64,10 @@ func CreateVotePage(c *gin.Context) {
 
 	moderatorID, err := repositories.GetUserIdByUsername(username)
 	if err != nil {
+		logger.Error(
+			"CreateVotePage - failed to get user ID by username",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -60,6 +77,9 @@ func CreateVotePage(c *gin.Context) {
 	}
 
 	if len(voteTitle) < 5 {
+		logger.Warn(
+			"CreateVotePage - vote title must be at least 5 characters",
+		)
 		voteTitleErr = "Vote title must be at least 5 characters"
 	}
 
@@ -68,6 +88,10 @@ func CreateVotePage(c *gin.Context) {
 	
 		_, err = repositories.CreateVote(newVote)
 		if err != nil {
+			logger.Error(
+				"CreateVotePage - failed to create vote",
+				"error", err.Error(),
+			)
 			utils.RenderError(
 				c,
 				http.StatusInternalServerError,
@@ -75,12 +99,21 @@ func CreateVotePage(c *gin.Context) {
 				"/electivote/create-vote-page/",
 			)
 		}
+
+		logger.Info(
+			"CreateVotePage - vote created",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
 		)
 		return
 	}
+
+	logger.Info(
+		"CreateVotePage - rendering create vote page with error messages",
+	)
 	context := gin.H {
 		"title": "Create Vote",
 		"voteTitleErr": voteTitleErr,
@@ -95,7 +128,12 @@ func CreateVotePage(c *gin.Context) {
 }
 
 func ViewManageVotesPage(c *gin.Context) {
+	logger.Info("ViewManageVotesPage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewManageVotesPage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -105,6 +143,10 @@ func ViewManageVotesPage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	votesData, err := repositories.GetVotesDataByUsername(username)
 	if err != nil {
+		logger.Error(
+			"ViewManageVotesPage - failed to get votes data by username",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -112,6 +154,10 @@ func ViewManageVotesPage(c *gin.Context) {
 			"/electivote/manage-vote-page/",
 		)
 	}
+
+	logger.Info(
+		"ViewManageVotesPage - rendering manage votes page",
+	)
 	context := gin.H {
 		"title": "Manage Votes",
 		"votes": votesData,
@@ -124,7 +170,12 @@ func ViewManageVotesPage(c *gin.Context) {
 }
 
 func ViewManageVotePage(c *gin.Context) {
+	logger.Info("ViewManageVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewManageVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -135,6 +186,10 @@ func ViewManageVotePage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
+		logger.Warn(
+			"ViewManageVotePage - User is not a valid vote moderator",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -163,6 +218,10 @@ func ViewManageVotePage(c *gin.Context) {
 	wg.Wait()
 
 	if voteDataErr != nil {
+		logger.Error(
+			"ViewManageVotePage - failed to get vote data by vote ID",
+			"error", voteDataErr.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -173,6 +232,10 @@ func ViewManageVotePage(c *gin.Context) {
 	}
 
 	if candidatesErr != nil {
+		logger.Error(
+			"ViewManageVotePage - failed to get candidates by vote ID",
+			"error", candidatesErr.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -182,6 +245,9 @@ func ViewManageVotePage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"ViewManageVotePage - rendering manage vote page",
+	)
 	context := gin.H{
 		"title":      "Manage Vote",
 		"voteData":   voteData,
@@ -196,7 +262,12 @@ func ViewManageVotePage(c *gin.Context) {
 }
 
 func ManageVotePage(c *gin.Context) {
+	logger.Info("ManageVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ManageVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -207,6 +278,10 @@ func ManageVotePage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
+		logger.Warn(
+			"ManageVotePage - User is not a valid vote moderator",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -216,6 +291,10 @@ func ManageVotePage(c *gin.Context) {
 
 	voteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"ManageVotePage - failed to get vote data by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -229,6 +308,9 @@ func ManageVotePage(c *gin.Context) {
 	voteDesc := c.PostForm("voteDesc")
 
 	if len(voteTitle) < 5 {
+		logger.Warn(
+			"ManageVotePage - vote title must be at least 5 characters",
+		)
 		voteTitleErr = "Vote title must be at least 5 characters"
 	}
 
@@ -236,6 +318,10 @@ func ManageVotePage(c *gin.Context) {
 		newVote := factories.UpdateVoteFactory(voteTitle, voteDesc)
 		_, err := repositories.UpdateVote(uint(voteID), newVote)
 		if err != nil {
+			logger.Error(
+				"ManageVotePage - failed to update vote",
+				"error", err.Error(),
+			)
 			utils.RenderError(
 				c,
 				http.StatusInternalServerError,
@@ -243,12 +329,21 @@ func ManageVotePage(c *gin.Context) {
 				"/electivote/manage-vote-page/",
 			)
 		}
+
+		logger.Info(
+			"ManageVotePage - vote updated",
+			"action", "redirecting to manage vote page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/manage-vote-page/",
 		)
 		return
 	}
+
+	logger.Info(
+		"ManageVotePage - rendering manage vote page with error messages",
+	)
 	context := gin.H {
 		"title": "Manage Vote",
 		"voteData": voteData,
@@ -264,7 +359,12 @@ func ManageVotePage(c *gin.Context) {
 }
 
 func ViewDeleteVotePage(c *gin.Context) {
+	logger.Info("ViewDeleteVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewDeleteVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -275,6 +375,10 @@ func ViewDeleteVotePage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
+		logger.Warn(
+			"ViewDeleteVotePage - User is not a valid vote moderator",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -284,6 +388,10 @@ func ViewDeleteVotePage(c *gin.Context) {
 
 	voteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"ViewDeleteVotePage - failed to get vote data by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -292,6 +400,9 @@ func ViewDeleteVotePage(c *gin.Context) {
 		)
 	}
 
+	logger.Info(
+		"ViewDeleteVotePage - rendering delete vote page",
+	)
 	context := gin.H {
 		"title": "Delete Vote",
 		"voteData": voteData,
@@ -304,7 +415,12 @@ func ViewDeleteVotePage(c *gin.Context) {
 }
 
 func DeleteVotePage(c *gin.Context) {
+	logger.Info("DeleteVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"DeleteVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -315,6 +431,10 @@ func DeleteVotePage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
+		logger.Warn(
+			"DeleteVotePage - User is not a valid vote moderator",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -324,6 +444,10 @@ func DeleteVotePage(c *gin.Context) {
 
 	err := repositories.DeleteVote(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"DeleteVotePage - failed to delete vote",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -332,6 +456,10 @@ func DeleteVotePage(c *gin.Context) {
 		)
 	}
 
+	logger.Info(
+		"DeleteVotePage - vote deleted",
+		"action", "redirecting to manage votes page",
+	)
 	c.Redirect(
 		http.StatusFound,
 		"/electivote/manage-vote-page/",
@@ -339,7 +467,12 @@ func DeleteVotePage(c *gin.Context) {
 }
 
 func ViewJoinVotePage(c *gin.Context) {
+	logger.Info("ViewJoinVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewJoinVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -347,6 +480,9 @@ func ViewJoinVotePage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"ViewJoinVotePage - rendering join vote page",
+	)
 	context := gin.H {
 		"title": "Join Vote",
 	}
@@ -358,7 +494,12 @@ func ViewJoinVotePage(c *gin.Context) {
 }
 
 func JoinVotePage(c *gin.Context) {
+	logger.Info("JoinVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"JoinVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -370,6 +511,10 @@ func JoinVotePage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	userID, err := repositories.GetUserIdByUsername(username)
 	if err != nil {
+		logger.Error(
+			"JoinVotePage - failed to get user ID by username",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -380,19 +525,31 @@ func JoinVotePage(c *gin.Context) {
 	}
 
 	if repositories.IsVoted(uint(userID), voteCode) {
+		logger.Warn(
+			"JoinVotePage - user already voted in this vote",
+		)
 		voteCodeErr = "You already voted in this vote"
 	}
 
 	if len(voteCode) != 6 {
+		logger.Warn(
+			"JoinVotePage - vote code must be 6 characters",
+		)
 		voteCodeErr = "Vote code must be 6 characters"
 	}
 
 	_, err = repositories.GetVoteByVoteCode(voteCode)
 	if len(voteCode) == 6 && err != nil {
+		logger.Warn(
+			"JoinVotePage - vote code not found",
+		)
 		voteCodeErr = "Vote code not found"
 	}
 
 	if voteCodeErr != "" {
+		logger.Info(
+			"JoinVotePage - rendering join vote page with error messages",
+		)
 		context := gin.H {
 			"title": "Join Vote",
 			"voteCode": voteCode,
@@ -405,6 +562,10 @@ func JoinVotePage(c *gin.Context) {
 		)
 		return
 	}
+
+	logger.Info(
+		"JoinVotePage - redirecting to vote page",
+	)
 	c.Redirect(
 		http.StatusFound,
 		"/electivote/vote-page/" + voteCode,
@@ -412,7 +573,12 @@ func JoinVotePage(c *gin.Context) {
 }
 
 func ViewVotePage(c *gin.Context) {
+	logger.Info("ViewVotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewVotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -422,6 +588,10 @@ func ViewVotePage(c *gin.Context) {
 	voteCode := c.Param("voteCode")
 	voteID, err := repositories.GetVoteIDByVoteCode(voteCode)
 	if err != nil {
+		logger.Error(
+			"ViewVotePage - failed to get vote ID by vote code",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -432,6 +602,10 @@ func ViewVotePage(c *gin.Context) {
 
 	VoteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"ViewVotePage - failed to get vote data by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -442,6 +616,10 @@ func ViewVotePage(c *gin.Context) {
 
 	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"ViewVotePage - failed to get candidates by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -450,6 +628,9 @@ func ViewVotePage(c *gin.Context) {
 		)
 	}
 	
+	logger.Info(
+		"ViewVotePage - rendering vote page",
+	)
 	context := gin.H {
 		"title": "Vote",
 		"candidates": candidates,
@@ -465,7 +646,12 @@ func ViewVotePage(c *gin.Context) {
 }	
 
 func VotePage(c *gin.Context) {
+	logger.Info("VotePage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"VotePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -477,6 +663,10 @@ func VotePage(c *gin.Context) {
 	voteCode := c.Param("voteCode")
 	voteID, err := repositories.GetVoteIDByVoteCode(voteCode)
 	if err != nil {
+		logger.Error(
+			"VotePage - failed to get vote ID by vote code",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -487,6 +677,10 @@ func VotePage(c *gin.Context) {
 
 	VoteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"VotePage - failed to get vote data by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -500,6 +694,10 @@ func VotePage(c *gin.Context) {
 
 	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"VotePage - failed to get candidates by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -509,10 +707,16 @@ func VotePage(c *gin.Context) {
 	}
 
 	if voted == "" {
+		logger.Warn(
+			"VotePage - please select a candidate",
+		)
 		votedErr = "Please select a candidate"
 	}
 
 	if votedErr != "" {
+		logger.Info(
+			"VotePage - rendering vote page with error messages",
+		)
 		context := gin.H {
 			"title": "Vote",
 			"votedErr": votedErr,
@@ -536,6 +740,10 @@ func VotePage(c *gin.Context) {
 	votedRecord := factories.VoteRecordFactory(uint(voteID), uint(userID), uint(votedInt), votedTime)
 	_, err = repositories.CreateVoteRecord(votedRecord)
 	if err != nil {
+		logger.Error(
+			"VotePage - failed to create vote record",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -547,6 +755,10 @@ func VotePage(c *gin.Context) {
 
 	err = repositories.IncrementCandidateVote(uint(votedInt))
 	if err != nil {
+		logger.Error(
+			"VotePage - failed to increment candidate vote",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -556,6 +768,10 @@ func VotePage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"VotePage - vote recorded",
+		"action", "redirecting to home page",
+	)
 	c.Redirect(
 		http.StatusFound,
 		"/electivote/home-page/",
@@ -563,7 +779,12 @@ func VotePage(c *gin.Context) {
 }
 
 func ViewVoteResultPage(c *gin.Context) {
+	logger.Info("ViewVoteResultPage - page accessed")
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewVoteResultPage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -574,6 +795,10 @@ func ViewVoteResultPage(c *gin.Context) {
 	username := middlewares.GetUserData(c)
 	voteID, _ := strconv.Atoi(c.Param("voteID"))
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
+		logger.Warn(
+			"ViewVoteResultPage - User is not a valid vote moderator",
+			"action", "redirecting to home page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/home-page/",
@@ -583,6 +808,10 @@ func ViewVoteResultPage(c *gin.Context) {
 
 	voteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"ViewVoteResultPage - failed to get vote data by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -593,6 +822,10 @@ func ViewVoteResultPage(c *gin.Context) {
 
 	candidates, err := repositories.GetCandidatesByVoteID(uint(voteID))
 	if err != nil {
+		logger.Error(
+			"ViewVoteResultPage - failed to get candidates by vote ID",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -603,6 +836,10 @@ func ViewVoteResultPage(c *gin.Context) {
 
 	candidatesJson, err := json.Marshal(candidates)
 	if err != nil {
+		logger.Error(
+			"ViewVoteResultPage - failed to marshal candidates",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -614,9 +851,15 @@ func ViewVoteResultPage(c *gin.Context) {
 	isExist := true
 
 	if len(candidates) == 0 {
+		logger.Warn(
+			"ViewVoteResultPage - no candidates found",
+		)
 		isExist = false
 	}
 
+	logger.Info(
+		"ViewVoteResultPage - rendering vote result page",
+	)
 	context := gin.H {
 		"title": "Vote Result",
 		"voteID": voteID,

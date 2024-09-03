@@ -15,7 +15,14 @@ import (
 )
 
 func ViewProfilePage(c *gin.Context) {
+	logger.Info(
+		"ViewProfilePage - page accessed",
+	)
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewProfilePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -53,6 +60,10 @@ func ViewProfilePage(c *gin.Context) {
 	wg.Wait()
 
 	if profileErr != nil {
+		logger.Error(
+			"ViewProfilePage - failed to get user profile",
+			"error", profileErr.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -63,6 +74,10 @@ func ViewProfilePage(c *gin.Context) {
 	}
 
 	if emailErr != nil {
+		logger.Error(
+			"ViewProfilePage - failed to get user email",
+			"error", emailErr.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -72,6 +87,9 @@ func ViewProfilePage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"ViewProfilePage - rendering profile page",
+	)
 	formattedDob := utils.FormattedDob(userProfile.Birthday)
 	context := gin.H{
 		"title":       "Edit Profile",
@@ -89,7 +107,14 @@ func ViewProfilePage(c *gin.Context) {
 }
 
 func ViewEditProfilePage(c *gin.Context) {
+	logger.Info(
+		"ViewEditProfilePage - page accessed",
+	)
 	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewEditProfilePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
 		c.Redirect(
 			http.StatusFound,
 			"/electivote/login-page/",
@@ -127,6 +152,10 @@ func ViewEditProfilePage(c *gin.Context) {
 	wg.Wait()
 
 	if profileErr != nil {
+		logger.Error(
+			"ViewEditProfilePage - failed to get user profile",
+			"error", profileErr.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -137,6 +166,10 @@ func ViewEditProfilePage(c *gin.Context) {
 	}
 
 	if emailErr != nil {
+		logger.Error(
+			"ViewEditProfilePage - failed to get user email",
+			"error", emailErr.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -146,6 +179,9 @@ func ViewEditProfilePage(c *gin.Context) {
 		return
 	}
 
+	logger.Info(
+		"ViewEditProfilePage - rendering edit profile page",
+	)
 	formattedDob := utils.FormattedDob(userProfile.Birthday)
 	context := gin.H{
 		"title":       "Edit Profile",
@@ -163,7 +199,14 @@ func ViewEditProfilePage(c *gin.Context) {
 }
 
 func EditProfilePage(c *gin.Context) {
+	logger.Info(
+		"EditProfilePage - page accessed",
+	)
     if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"EditProfilePage - User is not logged in",
+			"action", "redirecting to login page",
+		)
         c.Redirect(
             http.StatusFound,
             "/electivote/login-page/",
@@ -178,6 +221,10 @@ func EditProfilePage(c *gin.Context) {
 
 	userProfile, err := repositories.GetProfilesByUsername(username)
 	if err != nil {
+		logger.Error(
+			"EditProfilePage - failed to get user profile",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -197,6 +244,9 @@ func EditProfilePage(c *gin.Context) {
     if age != "" {
         convAge, err := strconv.Atoi(age)
         if err != nil {
+			logger.Warn(
+				"EditProfilePage - age must be a number",
+			)
             ageErr = "Age must be a number"
         } else {
             convertedAge = uint(convAge)
@@ -205,6 +255,10 @@ func EditProfilePage(c *gin.Context) {
 
 	userEmail, err := repositories.GetUserEmailByUsername(username)
 	if err != nil {
+		logger.Error(
+			"EditProfilePage - failed to get user email",
+			"error", err.Error(),
+		)
 		utils.RenderError(
 			c,
 			http.StatusInternalServerError,
@@ -217,6 +271,9 @@ func EditProfilePage(c *gin.Context) {
     if dob != "" {
         parsedDob, err := time.Parse("2006-01-02", dob)
         if err != nil {
+			logger.Warn(
+				"EditProfilePage - Date of Birth must be in format YYYY-MM-DD",
+			)
             dobErr = "Date of Birth must be in format YYYY-MM-DD"
             finalDOB = models.NullTime{Valid: false}
         } else {
@@ -235,6 +292,10 @@ func EditProfilePage(c *gin.Context) {
 
         if file != nil {
 			if fileErr != nil {
+				logger.Error(
+					"EditProfilePage - failed to get file",
+					"error", fileErr.Error(),
+				)
 				utils.RenderError(
 					c,
 					http.StatusInternalServerError,
@@ -245,6 +306,10 @@ func EditProfilePage(c *gin.Context) {
 			newProfile.Picture = file.Filename
 			err = c.SaveUploadedFile(file, "internal/assets/images/"+file.Filename)
 			if err != nil {
+				logger.Error(
+					"EditProfilePage - failed to save file",
+					"error", err.Error(),
+				)
 				utils.RenderError(
 					c,
 					http.StatusInternalServerError,
@@ -255,6 +320,10 @@ func EditProfilePage(c *gin.Context) {
 			}
 			_, err = repositories.UpdateProfileByUsername(username, newProfile)
 			if err != nil {
+				logger.Error(
+					"EditProfilePage - failed to update profile",
+					"error", err.Error(),
+				)
 				utils.RenderError(
 					c,
 					http.StatusInternalServerError,
@@ -263,6 +332,10 @@ func EditProfilePage(c *gin.Context) {
 				)
 				return
 			}
+			logger.Info(
+				"EditProfilePage - profile updated",
+				"action", "redirecting to profile page",
+			)
 			c.Redirect(
 				http.StatusFound,
 				"/electivote/profile-page/",
@@ -272,6 +345,10 @@ func EditProfilePage(c *gin.Context) {
 
         _, err := repositories.UpdateProfileByUsername(username, newProfile)
         if err != nil {
+			logger.Error(
+				"EditProfilePage - failed to update profile",
+				"error", err.Error(),
+			)
             utils.RenderError(
                 c,
                 http.StatusInternalServerError,
@@ -280,6 +357,10 @@ func EditProfilePage(c *gin.Context) {
             )
             return
         }
+		logger.Info(
+			"EditProfilePage - profile updated",
+			"action", "redirecting to profile page",
+		)
         c.Redirect(
             http.StatusFound,
             "/electivote/profile-page/",
@@ -287,6 +368,9 @@ func EditProfilePage(c *gin.Context) {
         return
     }
 
+	logger.Info(
+		"EditProfilePage - rendering edit profile page with error message",
+	)
     context := gin.H{
         "firstNameErr": firstNameErr,
 		"firstName":    firstName,
