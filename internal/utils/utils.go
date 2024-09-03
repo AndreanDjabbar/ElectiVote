@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math/big"
 	"net/http"
 	"net/url"
@@ -15,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AndreanDjabbar/ElectiVote/config"
 	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
 	"github.com/dgrijalva/jwt-go"
@@ -25,8 +27,12 @@ import (
 
 var SecretKey []byte = []byte(os.Getenv("SECRET_KEY"))
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+var logger *slog.Logger = config.SetUpLogger()
 
 func GenerateSecureToken(username string) (string, error) {
+	logger.Info(
+		"GenerateSecureToken - generating secure token",
+	)
 	timestamp := time.Now().Unix()
 	data := fmt.Sprintf("%s:%d", username, timestamp)
 	h := hmac.New(sha256.New, []byte(SecretKey))
@@ -36,8 +42,15 @@ func GenerateSecureToken(username string) (string, error) {
 }
 
 func ExtractUsername(token string) (string, error) {
+	logger.Info(
+		"ExtractUsername - extracting username from token",
+	)
 	parts := strings.Split(token, ":")
 	if len(parts) != 3 {
+		logger.Error(
+			"ExtractUsername - invalid token format",
+			"error", fmt.Errorf("invalid token format"),
+		)
 		return "", fmt.Errorf("invalid token format")
 	}
 
@@ -47,6 +60,10 @@ func ExtractUsername(token string) (string, error) {
 	expectedSignature := hex.EncodeToString(h.Sum(nil))
 
 	if !hmac.Equal([]byte(expectedSignature), []byte(parts[2])) {
+		logger.Error(
+			"ExtractUsername - invalid token signature",
+			"error", fmt.Errorf("invalid token signature"),
+		)
 		return "", fmt.Errorf("invalid token signature")
 	}
 
@@ -54,35 +71,60 @@ func ExtractUsername(token string) (string, error) {
 }
 
 func IsValidEmail(email string) bool {
+	logger.Info(
+		"IsValidEmail - validating email",
+	)
 	const emailPattern = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	re := regexp.MustCompile(emailPattern)
 	return re.MatchString(email)
 }
 
 func HashPassword(password string) (string, error) {
+	logger.Info(
+		"HashPassword - hashing password",
+	)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
+		logger.Error(
+			"HashPassword - error hashing password",
+			"error", err,
+		)
         return "", err
     }
     return string(hashedPassword), nil
 } 
 
 func ValidateLoginInput(username, password string) (string, string) {
+	logger.Info(
+		"ValidateLoginInput - validating login input",
+	)
 	usernameErr, passwordErr := "", ""
 
 	if username == "" {
+		logger.Warn(
+			"ValidateLoginInput - username must be filled",
+		)
 		usernameErr = "Username Must be Filled"
 	}
 
 	if password == "" {
+		logger.Warn(
+			"ValidateLoginInput - password must be filled",
+		)
 		passwordErr = "Password Must be Filled"
 	}
 
 	if len(username) != 0 && (len(username) < 5 || len(username) > 255) {
+		logger.Warn(
+			"ValidateLoginInput - username must be between 5 and 255 characters",
+		)
 		usernameErr = "Username must be between 5 and 255 characters"
 	}
 
 	if len(password) != 0 && (len(password) < 5 || len(password) > 255) {
+		logger.Warn(
+			"ValidateLoginInput - password must be between 5 and 255 characters",
+		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
@@ -90,41 +132,71 @@ func ValidateLoginInput(username, password string) (string, string) {
 }
 
 func ValidateRegisterInput(username, password, password2, email string) (string, string, string, string) {
+	logger.Info(
+		"ValidateRegisterInput - validating register input",
+	)
 	usernameErr, passwordErr, password2Err,  emailErr := "", "", "", ""
 
 	if username == "" {
+		logger.Warn(
+			"ValidateRegisterInput - username must be filled",
+		)
 		usernameErr = "Username must be filled"
 	}
 
 	if password == "" {
+		logger.Warn(
+			"ValidateRegisterInput - password must be filled",
+		)
 		passwordErr = "Password must be filled"
 	}
 
 	if password2 == "" {
+		logger.Warn(
+			"ValidateRegisterInput - password confirmation must be filled",
+		)
 		password2Err = "Password Confirmation must be filled"
 	}
 
 	if password2 != "" && password != password2 {
-		password2Err = "Password and Password Confirmation must be the same"
+		logger.Warn(
+			"ValidateRegisterInput - password and password confirmation must be same",
+		)
+		password2Err = "Password and Password Confirmation must be same"
 	}
 
 	if email == "" {
+		logger.Warn(
+			"ValidateRegisterInput - email must be filled",
+		)
 		emailErr = "Email must be filled"
 	}
 
 	if len(username) != 0 && (len(username) < 5 || len(username) > 255) {
+		logger.Warn(
+			"ValidateRegisterInput - username must be between 5 and 255 characters",
+		)
 		usernameErr = "Username must be between 5 and 255 characters"
 	}
 
 	if len(password) != 0 && (len(password) < 5 || len(password) > 255) {
+		logger.Warn(
+			"ValidateRegisterInput - password must be between 5 and 255 characters",
+		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
 	if len(password2) != 0 && (len(password2) < 5 || len(password2) > 255) {
+		logger.Warn(
+			"ValidateRegisterInput - password confirmation must be between 5 and 255 characters",
+		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
 	if email != "" && !IsValidEmail(email) {
+		logger.Warn(
+			"ValidateRegisterInput - email must contain @ and end with .com or .co.id",
+		)
 		emailErr = "Email must contain @ and end with .com or .co.id"
 	}
 	
@@ -132,26 +204,44 @@ func ValidateRegisterInput(username, password, password2, email string) (string,
 }
 
 func IsValidPhoneNumber(phone string) bool {
+	logger.Info(
+		"IsValidPhoneNumber - validating phone number",
+	)
 	isValid := regexp.MustCompile(`^[0-9]+$`).MatchString(phone)
 	return isValid
 }
 
 func ValidateProfileInput(firstName, lastname, phone string, age uint) (string, string, string, string) {
+	logger.Info(
+		"ValidateProfileInput - validating profile input",
+	)
 	firstNameErr, lastNameErr, phoneErr, ageErr :=  "", "", "", ""
 
 	if firstName != "" && (len(firstName) < 5 || len(firstName) > 255) {
+		logger.Warn(
+			"ValidateProfileInput - first name must be between 5 and 255 characters",
+		)
 		firstNameErr = "First Name must be between 5 and 255 characters"
 	}
 
 	if lastname != "" && (len(lastname) < 5 || len(lastname) > 255) {
+		logger.Warn(
+			"ValidateProfileInput - last name must be between 5 and 255 characters",
+		)
 		lastNameErr = "Last Name must be between 5 and 255 characters"
 	}
 
 	if age != 0 && (age <= 5 || age > 100) {
+		logger.Warn(
+			"ValidateProfileInput - age must be between 5 and 100",
+		)
 		ageErr = "Age must be between 5 and 100"
 	}
 
 	if phone != "" && !IsValidPhoneNumber(phone) {
+		logger.Warn(
+			"ValidateProfileInput - phone number must be a number",
+		)
 		phoneErr = "Phone number must be a number"
 	}
 
@@ -159,6 +249,9 @@ func ValidateProfileInput(firstName, lastname, phone string, age uint) (string, 
 }
 
 func RenderError(c *gin.Context, statusCode int, errMsg string, source string) {
+	logger.Info(
+		"RenderError - rendering error",
+	)
 	context := gin.H{
 		"title":  "Error",
 		"error":  errMsg,
@@ -172,6 +265,9 @@ func RenderError(c *gin.Context, statusCode int, errMsg string, source string) {
 }
 
 func FormattedDob(nt models.NullTime) string {
+	logger.Info(
+		"FormattedDob - formatting date of birth",
+	)
 	if nt.Valid {
 		return nt.Time.Format("2006-01-02")
 	}
@@ -179,10 +275,17 @@ func FormattedDob(nt models.NullTime) string {
 }
 
 func voteCodeMaker() string {
+	logger.Info(
+		"voteCodeMaker - generating vote code",
+	)
     result := make([]byte, 6)
     for i := range result {
         num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
         if err != nil {
+			logger.Error(
+				"voteCodeMaker - error generating vote code",
+				"error", err,
+			)
             return ""
         }
         result[i] = charset[num.Int64()]
@@ -191,6 +294,9 @@ func voteCodeMaker() string {
 }
 
 func GenerateVoteCode() string {
+	logger.Info(
+		"GenerateVoteCode - generating vote code",
+	)
 	voteCode := voteCodeMaker()
 	for !repositories.IsUniqueCode(voteCode) {
 		voteCode = voteCodeMaker()
@@ -199,6 +305,9 @@ func GenerateVoteCode() string {
 }
 
 func GenerateResetToken(userEmail string) (string, error) {
+	logger.Info(
+		"GenerateResetToken - generating reset token",
+	)
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "email": userEmail,
         "exp":   time.Now().Add(1 * time.Hour).Unix(),
@@ -206,12 +315,19 @@ func GenerateResetToken(userEmail string) (string, error) {
 
     tokenString, err := token.SignedString(SecretKey)
     if err != nil {
+		logger.Error(
+			"GenerateResetToken - error generating reset token",
+			"error", err,
+		)
         return "", err
     }
     return tokenString, nil
 }
 
 func GetEmailDomain(email string) string {
+	logger.Info(
+		"GetEmailDomain - getting email domain",
+	)
 	index := strings.LastIndex(email, "@")
 	if index == -1 {
 		return ""
@@ -220,6 +336,9 @@ func GetEmailDomain(email string) string {
 }
 
 func GetEmailProvider(emailDomain string) string {
+	logger.Info(
+		"GetEmailProvider - getting email provider",
+	)
 	providers := map[string]string{
 		"gmail.com": "smtp.gmail.com",
 		"yahoo.com": "smtp.yahoo.com",
@@ -230,12 +349,19 @@ func GetEmailProvider(emailDomain string) string {
 }
 
 func GenerateOTP() (string, error) {
+	logger.Info(
+		"GenerateOTP - generating OTP",
+	)
 	const otpLength = 6
 	var otp string
 
 	for i := 0; i < otpLength; i++ {
 		num, err := rand.Int(rand.Reader, big.NewInt(10))
 		if err != nil {
+			logger.Error(
+				"GenerateOTP - error generating OTP",
+				"error", err,
+			)
 			return "", err
 		}
 		otp += num.String()
@@ -245,6 +371,9 @@ func GenerateOTP() (string, error) {
 }
 
 func SendEmail(email, emailProvider, body string, subject string) error {
+	logger.Info(
+		"SendEmail - sending email",
+	)
     services := map[string]struct {
         from     string
         password string
@@ -267,6 +396,9 @@ func SendEmail(email, emailProvider, body string, subject string) error {
 
     service, exists := services[emailProvider]
     if !exists {
+		logger.Error(
+			"SendEmail - unsupported email provider",
+		)
         return fmt.Errorf("unsupported email provider: %s", emailProvider)
     }
 
@@ -280,6 +412,10 @@ func SendEmail(email, emailProvider, body string, subject string) error {
     d := gomail.NewDialer(service.host, service.port, service.from, service.password)
 
     if err := d.DialAndSend(m); err != nil {
+		logger.Error(
+			"SendEmail - failed to send email",
+			"error", err,
+		)
         return fmt.Errorf("failed to send email: %v", err)
     }
 
@@ -287,6 +423,9 @@ func SendEmail(email, emailProvider, body string, subject string) error {
 }
 
 func IsValidReCAPTCHA(c *gin.Context) bool {
+	logger.Info(
+		"IsValidReCAPTCHA - validating reCAPTCHA",
+	)
 	recaptchaResponse := c.PostForm("g-recaptcha-response")
 	secretKey := os.Getenv("RECAPTCHA_SECRET_KEY")
 
@@ -294,6 +433,9 @@ func IsValidReCAPTCHA(c *gin.Context) bool {
 		url.Values{"secret": {secretKey}, "response": {recaptchaResponse}})
 
 	if err != nil {
+		logger.Error(
+			"IsValidReCAPTCHA - error verifying reCAPTCHA",
+		)
 		fmt.Println("Error verifying reCAPTCHA:", err)
 		return false
 	}
