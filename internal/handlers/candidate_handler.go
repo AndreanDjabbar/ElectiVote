@@ -18,7 +18,6 @@ var logger *slog.Logger = config.SetUpLogger()
 func ViewAddCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ViewAddCandidatePage - Page Accessed",
-		"method", c.Request.Method,
 	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
@@ -38,7 +37,6 @@ func ViewAddCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		logger.Warn(
 			"ViewAddCandidatePage - User not authorized",
-			"method", c.Request.Method,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -49,7 +47,6 @@ func ViewAddCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"ViewAddCandidatePage - Rendering Page",
-		"method", c.Request.Method,
 	)
 	context := gin.H {
 		"title": "Add Candidate",
@@ -65,12 +62,10 @@ func ViewAddCandidatePage(c *gin.Context) {
 func AddCandidatePage(c *gin.Context) {
 	logger.Info(
 		"AddCandidatePage - Page Accessed",
-		"method", c.Request.Method,
 	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"AddCandidatePage - User not logged in",
-			"method", c.Request.Method,
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -85,7 +80,6 @@ func AddCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		logger.Warn(
 			"AddCandidatePage - User not authorized",
-			"method", c.Request.Method,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -100,14 +94,15 @@ func AddCandidatePage(c *gin.Context) {
 	candidatePicture, candidatePictureErr := c.FormFile("candidatePicture")
 
 	if len(candidateName) < 3 {
+		logger.Warn(
+			"AddCandidatePage - Invalid Input",
+		)
 		candidateNameErr = "Candidate name must be at least 3 characters"
 	}
 
 	if candidateNameErr != "" {
 		logger.Warn(
-			"AddCandidatePage - Invalid Input",
-			"method", c.Request.Method,
-			"action", "rendering page with error message",
+			"AddCandidatePage - Rendering Page with Error Message",
 		)
 		context := gin.H {
 			"title": "Add Candidate",
@@ -127,10 +122,9 @@ func AddCandidatePage(c *gin.Context) {
 
 	if candidatePicture != nil {
 		if candidatePictureErr != nil {
-			logger.Warn(
+			logger.Error(
 				"AddCandidatePage - Error Uploading Picture",
-				"method", c.Request.Method,
-				"action", "rendering page with error message",
+				"error",candidatePictureErr.Error(),
 			)
 			utils.RenderError(
 				c,
@@ -144,10 +138,9 @@ func AddCandidatePage(c *gin.Context) {
 			"internal/assets/images/"+candidatePicture.Filename,
 		)
 		if err != nil {
-			logger.Warn(
+			logger.Error(
 				"AddCandidatePage - Error Saving Picture",
-				"method", c.Request.Method,
-				"action", "rendering page with error message",
+				"error", err.Error(),
 			)
 			utils.RenderError(
 				c,
@@ -158,16 +151,14 @@ func AddCandidatePage(c *gin.Context) {
 		}
 		logger.Info(
 			"AddCandidatePage - Picture Uploaded",
-			"method", c.Request.Method,
 		)
 		newCandidate.CandidatePicture = candidatePicture.Filename
 	}
 	_, err := repositories.AddCandidate(newCandidate)
 	if err != nil {
-		logger.Warn(
+		logger.Error(
 			"AddCandidatePage - Error Adding Candidate",
-			"method", c.Request.Method,
-			"action", "rendering page with error message",
+			"error", err.Error(),
 		)
 		utils.RenderError(
 			c,
@@ -178,7 +169,6 @@ func AddCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"AddCandidatePage - Candidate Added",
-		"method", c.Request.Method,
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
@@ -190,12 +180,10 @@ func AddCandidatePage(c *gin.Context) {
 func ViewManageCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ViewManageCandidatePage - Page Accessed",
-		"method", c.Request.Method,
 	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ViewManageCandidatePage - User not logged in",
-			"method", c.Request.Method,
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -212,7 +200,6 @@ func ViewManageCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"ViewManageCandidatePage - User not authorized",
-			"method", c.Request.Method,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -224,10 +211,9 @@ func ViewManageCandidatePage(c *gin.Context) {
 
 	candidateData, err := repositories.GetCandidateByCandidateID(uint(candidateID))
 	if err != nil {
-		logger.Warn(
+		logger.Error(
 			"ViewManageCandidatePage - Error Getting Candidate",
-			"method", c.Request.Method,
-			"action", "rendering error page",
+			"Error", err.Error(),
 		)
 		utils.RenderError(
 			c,
@@ -239,7 +225,6 @@ func ViewManageCandidatePage(c *gin.Context) {
 
 	logger.Info(
 		"ViewManageCandidatePage - Rendering Page",
-		"method", c.Request.Method,
 	)
 	context := gin.H {
 		"title": "Manage Candidate",
@@ -257,12 +242,10 @@ func ViewManageCandidatePage(c *gin.Context) {
 func ManageCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ManageCandidatePage - Page Accessed",
-		"method", c.Request.Method,
 	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ManageCandidatePage - User not logged in",
-			"method", c.Request.Method,
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -279,7 +262,6 @@ func ManageCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"ManageCandidatePage - User not authorized",
-			"method", c.Request.Method,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -291,10 +273,9 @@ func ManageCandidatePage(c *gin.Context) {
 
 	candidateData, err := repositories.GetCandidateByCandidateID(uint(candidateID))
 	if err != nil {
-		logger.Warn(
+		logger.Error(
 			"ManageCandidatePage - Error Getting Candidate",
-			"method", c.Request.Method,
-			"action", "rendering error page",
+			"error", err.Error(),
 		)
 		utils.RenderError(
 			c,
@@ -310,13 +291,15 @@ func ManageCandidatePage(c *gin.Context) {
 	candidatePicture, candidatePictureErr := c.FormFile("candidatePicture")
 
 	if len(candidateName) < 3 {
+		logger.Warn(
+			"ManageCandidatePage - Invalid Input",
+		)
 		candidateNameErr = "Candidate name must be at least 3 characters"
 	}
 
 	if candidateNameErr != "" {
 		logger.Warn(
 			"ManageCandidatePage - Invalid Input",
-			"method", c.Request.Method,
 			"action", "rendering page with error message",
 		)
 		context := gin.H {
@@ -340,10 +323,9 @@ func ManageCandidatePage(c *gin.Context) {
 
 	if candidatePicture != nil {
 		if candidatePictureErr != nil {
-			logger.Warn(
+			logger.Error(
 				"ManageCandidatePage - Error Uploading Picture",
-				"method", c.Request.Method,
-				"action", "rendering page with error message",
+				"error", candidatePictureErr.Error(),
 			)
 			utils.RenderError(
 				c,
@@ -357,10 +339,9 @@ func ManageCandidatePage(c *gin.Context) {
 			"internal/assets/images/"+candidatePicture.Filename,
 		)
 		if err != nil {
-			logger.Warn(
+			logger.Error(
 				"ManageCandidatePage - Error Saving Picture",
-				"method", c.Request.Method,
-				"action", "rendering page with error message",
+				"error", err.Error(),
 			)
 			utils.RenderError(
 				c,
@@ -374,10 +355,9 @@ func ManageCandidatePage(c *gin.Context) {
 
 	_, err = repositories.UpdateCandidate(uint(candidateID), updatedCandidate)
 	if err != nil {	
-		logger.Warn(
+		logger.Error(
 			"ManageCandidatePage - Error Updating Candidate",
-			"method", c.Request.Method,
-			"action", "rendering page with error message",
+			"error", err.Error(),
 		)
 		utils.RenderError(
 			c,
@@ -388,7 +368,6 @@ func ManageCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"ManageCandidatePage - Candidate Updated",
-		"method", c.Request.Method,
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
@@ -400,12 +379,10 @@ func ManageCandidatePage(c *gin.Context) {
 func ViewDeleteCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ViewDeleteCandidatePage - Page Accessed",
-		"method", c.Request.Method,
 	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ViewDeleteCandidatePage - User not logged in",
-			"method", c.Request.Method,
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -422,7 +399,6 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"ViewDeleteCandidatePage - User not authorized",
-			"method", c.Request.Method,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -434,10 +410,9 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 
 	candidateData, err := repositories.GetCandidateByCandidateID(uint(candidateID))
 	if err != nil {
-		logger.Warn(
+		logger.Error(
 			"ViewDeleteCandidatePage - Error Getting Candidate",
-			"method", c.Request.Method,
-			"action", "rendering error page",
+			"error", err.Error(),
 		)
 		utils.RenderError(
 			c,
@@ -448,7 +423,6 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"ViewDeleteCandidatePage - Rendering Page",
-		"method", c.Request.Method,
 	)
 	context := gin.H {
 		"title": "Delete Candidate",
@@ -466,12 +440,10 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 func DeleteCandidatePage(c *gin.Context) {
 	logger.Info(
 		"DeleteCandidatePage - Page Accessed",
-		"method", c.Request.Method,
 	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"DeleteCandidatePage - User not logged in",
-			"method", c.Request.Method,
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -488,7 +460,6 @@ func DeleteCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"DeleteCandidatePage - User not authorized",
-			"method", c.Request.Method,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -499,10 +470,9 @@ func DeleteCandidatePage(c *gin.Context) {
 	}
 	err := repositories.DeleteCandidate(uint(candidateID))
 	if err != nil {
-		logger.Warn(
+		logger.Error(
 			"DeleteCandidatePage - Error Deleting Candidate",
-			"method", c.Request.Method,
-			"action", "rendering page with error message",
+			"error", err.Error(),
 		)
 		utils.RenderError(
 			c,
@@ -513,7 +483,7 @@ func DeleteCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"DeleteCandidatePage - Candidate Deleted",
-		"method", c.Request.Method,
+		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
 		http.StatusFound,
