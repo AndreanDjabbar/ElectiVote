@@ -14,9 +14,6 @@ var cookieKey string = os.Getenv("COOKIE_KEY")
 var logger *slog.Logger = config.SetUpLogger()
 
 func SetCookies(c *gin.Context, username string) {
-	logger.Info(
-		"SetCookies - setting cookies",
-	)
 	token, err := utils.GenerateSecureToken(username)
 	if err != nil {
 		logger.Error(
@@ -38,9 +35,6 @@ func SetCookies(c *gin.Context, username string) {
 }
 
 func GetCookies(c *gin.Context) string {
-	logger.Info(
-		"GetCookies - getting cookies",
-	)
 	cookie, err := c.Cookie(cookieKey)
 	if err != nil {
 		logger.Error(
@@ -61,9 +55,6 @@ func GetCookies(c *gin.Context) string {
 }
 
 func IsLogged(c *gin.Context) bool {
-	logger.Info(
-		"IsLogged - checking if user is logged in",
-	)
 	if GetSession(c) != "" {
 		return true
 	} else if GetCookies(c) != "" {
@@ -73,9 +64,6 @@ func IsLogged(c *gin.Context) bool {
 }
 
 func DeleteCookie(c *gin.Context) {
-	logger.Info(
-		"DeleteCookie - deleting cookies",
-	)
 	c.SetCookie(
 		cookieKey,
 		"",
@@ -88,9 +76,6 @@ func DeleteCookie(c *gin.Context) {
 }
 
 func GetUserData(c *gin.Context) string {
-	logger.Info(
-		"GetUserData - getting user session or cookies data",
-	)
 	if GetSession(c) != "" {
 		return GetSession(c)
 	} else if GetCookies(c) != "" {
