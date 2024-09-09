@@ -30,7 +30,6 @@ type NullTime struct {
 
 func (nt *NullTime) Scan(value interface{}) error {
 	if value == nil {
-		logger.Info("Profiles - Scanning Null Time")
 		nt.Time, nt.Valid = time.Time{}, false
 		return nil
 	}
@@ -56,7 +55,6 @@ func (nt *NullTime) Scan(value interface{}) error {
 
 func (nt NullTime) Value() (driver.Value, error) {
 	if !nt.Valid {
-		logger.Info("Profiles - Value Null Time")
 		return nil, nil
 	}
 	return nt.Time, nil
