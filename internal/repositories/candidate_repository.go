@@ -12,28 +12,24 @@ var logger *slog.Logger = config.SetUpLogger()
 
 func AddCandidate(newCandidate models.Candidate) (models.Candidate, error) {
 	err := db.DB.Create(&newCandidate).Error
-	logger.Info("Candidate Repository - Add Candidate")
 	return newCandidate, err
 }
 
 func GetCandidatesByVoteID(voteID uint) ([]models.Candidate, error) {
 	var candidates []models.Candidate
 	err := db.DB.Where("vote_id = ?", voteID).Find(&candidates).Error
-	logger.Info("Candidate Repository - Get Candidates By Vote ID")
 	return candidates, err
 }
 
 func GetCandidateByCandidateID(candidateID uint) (models.Candidate, error) {
 	candidate := models.Candidate{}
 	err := db.DB.Where("candidate_id = ?", candidateID).Find(&candidate).Error
-	logger.Info("Candidate Repository - Get Candidate By Candidate ID")
 	return candidate, err
 }
 
 func GetVoteIDByCandidateID(candidateID uint) (uint, error) {
 	candidate := models.Candidate{}
 	err := db.DB.Where("candidate_id = ?", candidateID).Find(&candidate).Error
-	logger.Info("Candidate Repository - Get Vote ID By Candidate ID")
 	return candidate.VoteId, err
 }
 
@@ -68,14 +64,11 @@ func IsValidCandidateModerator(username string, candidateID uint) bool {
 
 func UpdateCandidate(candidateID uint, candidate models.Candidate) (models.Candidate, error) {
 	err := db.DB.Model(&models.Candidate{}).Where("candidate_id = ?", candidateID).Updates(&candidate).Error
-	logger.Info("Candidate Repository - Update Candidate")
 	return candidate, err
 }
 
 func DeleteCandidate(candidateID uint) error {
-	logger.Info("Candidate Repository - Delete Candidate")
 	err := db.DB.Where("candidate_id = ?", candidateID).Delete(&models.Candidate{}).Error
-	logger.Info("Candidate Repository - Delete Candidate")
 	return err
 }
 
@@ -89,9 +82,7 @@ func IncrementCandidateVote(candidateID uint) error {
 		)
 		return err
 	}
-	logger.Info("Candidate Repository - Increment Candidate Vote")
 	candidate.TotalVotes += 1
 	err = db.DB.Model(&models.Candidate{}).Where("candidate_id = ?", candidateID).Updates(&candidate).Error
-	logger.Info("Candidate Repository - Increment Candidate Vote")
 	return err
 }

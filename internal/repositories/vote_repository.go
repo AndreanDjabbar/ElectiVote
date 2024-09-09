@@ -6,9 +6,6 @@ import (
 )
 
 func CreateVote(vote models.Vote) (models.Vote, error) {
-	logger.Info(
-		"Vote Repository - Creating Vote",
-	)
 	err := db.DB.Create(&vote).Error
 	if err != nil {
 		logger.Error(
@@ -21,9 +18,6 @@ func CreateVote(vote models.Vote) (models.Vote, error) {
 }
 
 func IsUniqueCode(voteCode string) (bool) {
-	logger.Info(
-		"Vote Repository - Check Unique Code",
-	)
 	votes := []models.Vote{}
 	db.DB.Where("vote_code = ?", voteCode).Find(&votes)
 	if len(votes) > 0 {
@@ -37,9 +31,6 @@ func IsUniqueCode(voteCode string) (bool) {
 }
 
 func GetVotesDataByUsername(username string) ([]models.Vote, error) {
-	logger.Info(
-		"Vote Repository - Get Votes Data By Username",
-	)
 	userID, err := GetUserIdByUsername(username)
 	if err != nil {
 		logger.Error(
@@ -61,9 +52,6 @@ func GetVotesDataByUsername(username string) ([]models.Vote, error) {
 }
 
 func GetVoteIDByUserID(userID uint) (uint, error) {
-	logger.Info(
-		"Vote Repository - Get Vote ID By User ID",
-	)
 	vote := models.Vote{}
 	err := db.DB.Where("moderator_id = ?", userID).Find(&vote).Error
 	if err != nil {
@@ -77,9 +65,6 @@ func GetVoteIDByUserID(userID uint) (uint, error) {
 }
 
 func GetVoteDataByVoteID(voteID uint) (models.Vote, error) {
-	logger.Info(
-		"Vote Repository - Get Vote Data By Vote ID",
-	)
 	vote := models.Vote{}
 	err := db.DB.Where("vote_id = ?", voteID).Find(&vote).Error
 	if err != nil {
@@ -93,9 +78,6 @@ func GetVoteDataByVoteID(voteID uint) (models.Vote, error) {
 }
 
 func GetModeratorIDByVoteID(voteID uint) (uint, error) {
-	logger.Info(
-		"Vote Repository - Get Moderator ID By Vote ID",
-	)
 	vote := models.Vote{}
 	err := db.DB.Where("vote_id = ?", voteID).Find(&vote).Error
 	if err != nil {
@@ -109,9 +91,6 @@ func GetModeratorIDByVoteID(voteID uint) (uint, error) {
 }
 
 func IsValidVoteModerator(username string, voteID uint) bool {
-	logger.Info(
-		"Vote Repository - Check Valid Vote Moderator",
-	)
 	userID, err := GetUserIdByUsername(username)
 	if err != nil {
 		logger.Error(
@@ -135,9 +114,6 @@ func IsValidVoteModerator(username string, voteID uint) bool {
 }
 
 func UpdateVote(voteID uint, vote models.Vote) (models.Vote, error) {
-	logger.Info(
-		"Vote Repository - Update Vote",
-	)
 	err := db.DB.Model(&vote).Where("vote_id = ?", voteID).Updates(vote).Error
 	if err != nil {
 		logger.Error(
@@ -150,9 +126,6 @@ func UpdateVote(voteID uint, vote models.Vote) (models.Vote, error) {
 }
 
 func DeleteVote(voteID uint) error {
-	logger.Info(
-		"Vote Repository - Delete Vote",
-	)
 	vote := models.Vote{}
 	err := db.DB.Where("vote_id = ?", voteID).Delete(&vote).Error
 	if err != nil {
@@ -166,9 +139,6 @@ func DeleteVote(voteID uint) error {
 }
 
 func GetVoteByVoteCode(voteCode string) (models.Vote, error) {
-	logger.Info(
-		"Vote Repository - Get Vote By Vote Code",
-	)
 	vote := models.Vote{}
 	err := db.DB.Where("BINARY vote_code = ?", voteCode).First(&vote).Error
 	if err != nil {
@@ -182,9 +152,6 @@ func GetVoteByVoteCode(voteCode string) (models.Vote, error) {
 }
 
 func GetVoteIDByVoteCode(voteCode string) (uint, error) {
-	logger.Info(
-		"Vote Repository - Get Vote ID By Vote Code",
-	)
 	vote := models.Vote{}
 	err := db.DB.Where("BINARY vote_code = ?", voteCode).First(&vote).Error
 	if err != nil {

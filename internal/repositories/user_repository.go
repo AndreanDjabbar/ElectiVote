@@ -7,9 +7,6 @@ import (
 )
 
 func RegisterUser(newUser models.User) (models.User, error) {
-	logger.Info(
-		"User Repository - Register User",
-	)
 	err := db.DB.Create(&newUser).Error
 	if err != nil {
 		logger.Error(
@@ -22,9 +19,6 @@ func RegisterUser(newUser models.User) (models.User, error) {
 }
 
 func GetUserByUsername(username string) (models.User, error) {
-	logger.Info(
-		"User Repository - Get User By Username",
-	)
 	var user models.User
 	err := db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
@@ -38,9 +32,6 @@ func GetUserByUsername(username string) (models.User, error) {
 }
 
 func CheckPasswordByUSername(username, password string) (bool, error) {
-	logger.Info(
-		"User Repository - Check Password By Username",
-	)
 	user, err := GetUserByUsername(username)
 	if err != nil {
 		logger.Error(
@@ -64,9 +55,6 @@ func CheckPasswordByUSername(username, password string) (bool, error) {
 }
 
 func GetUserIdByUsername(username string) (int, error) {
-	logger.Info(
-		"User Repository - Get User ID By Username",
-	)
 	user := models.User{}
 	err := db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
@@ -80,9 +68,6 @@ func GetUserIdByUsername(username string) (int, error) {
 }
 
 func GetUserEmailByUsername(username string) (string, error) {
-	logger.Info(
-		"User Repository - Get User Email By Username",
-	)
 	user := models.User{}
 	err := db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
@@ -96,9 +81,6 @@ func GetUserEmailByUsername(username string) (string, error) {
 }
 
 func GetUserByEmail(email string) (models.User, error) {
-	logger.Info(
-		"User Repository - Get User By Email",
-	)
 	var user models.User
 	err := db.DB.Where("email = ?", email).First(&user).Error
 	if err != nil {
@@ -112,9 +94,6 @@ func GetUserByEmail(email string) (models.User, error) {
 }
 
 func UpdatePasswordByEmail(email, passwordHashed string) (models.User, error) {
-	logger.Info(
-		"User Repository - Update Password By Email",
-	)
 	var user models.User
 	err := db.DB.Model(&user).Where("email = ?", email).Update("password", passwordHashed).Error
 	if err != nil {

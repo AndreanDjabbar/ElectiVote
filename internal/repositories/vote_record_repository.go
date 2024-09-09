@@ -6,9 +6,6 @@ import (
 )
 
 func CreateVoteRecord(voteRecord models.VoteRecord) (models.VoteRecord, error) {
-	logger.Info(
-		"Vote Record Repository - Creating Vote Record",
-	)
 	err := db.DB.Create(&voteRecord).Error
 	if err != nil {
 		logger.Error(
@@ -17,16 +14,10 @@ func CreateVoteRecord(voteRecord models.VoteRecord) (models.VoteRecord, error) {
 		)
 		return voteRecord, err
 	}
-	logger.Info(
-		"Vote Record Repository - Vote Record Created",
-	)
 	return voteRecord, nil
 }
 
 func IsVoted(userID uint, voteCode string) (bool) {
-	logger.Info(
-		"Vote Record Repository - Check User Voted",
-	)
 	voteID, err := GetVoteIDByVoteCode(voteCode)
 	if err != nil {
 		logger.Error(
@@ -44,8 +35,5 @@ func IsVoted(userID uint, voteCode string) (bool) {
 		)
 		return false
 	}
-	logger.Info(
-		"Vote Record Repository - User Voted",
-	)
 	return true
 }

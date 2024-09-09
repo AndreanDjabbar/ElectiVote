@@ -6,9 +6,6 @@ import (
 )
 
 func CreateProfile(newProfile models.Profile) (models.Profile, error) {
-	logger.Info(
-		"Profile Repository - Creating Profile",
-	)
 	err := db.DB.Create(&newProfile).Error
 	if err != nil {
 		logger.Error(
@@ -21,9 +18,6 @@ func CreateProfile(newProfile models.Profile) (models.Profile, error) {
 }
 
 func UpdateProfileByUsername(username string, newProfile models.Profile) (models.Profile, error) {
-	logger.Info(
-		"Profile Repository - Updating Profile",
-	)
 	userId, err := GetUserIdByUsername(username)
 	if err != nil {
 		logger.Error(
@@ -53,9 +47,6 @@ func UpdateProfileByUsername(username string, newProfile models.Profile) (models
 }
 
 func GetProfilesByUsername(username string) (models.Profile, error) {
-	logger.Info(
-		"Profile Repository - Get Profile By Username",
-	)
 	userId, err := GetUserIdByUsername(username)
 	if err != nil {
 		logger.Error(
