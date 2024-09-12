@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+
 	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
 	"github.com/AndreanDjabbar/ElectiVote/internal/repositories"
 	"github.com/AndreanDjabbar/ElectiVote/internal/utils"
@@ -13,12 +14,12 @@ import (
 )
 
 func ViewLoginPage(c *gin.Context) {
-	logger.Info(
-		"ViewLoginPage - Page Accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ViewLoginPage - User already logged in",
+			"username", username,
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -29,12 +30,13 @@ func ViewLoginPage(c *gin.Context) {
 	}
 
 	logger.Info(
-		"ViewLoginPage - Rendering Login Page",
+		"ViewLoginPage - Login page acessed",
+		"Client IP", c.ClientIP(),
 	)
 
 	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
-	context := gin.H {
-		"title": "Login",
+	context := gin.H{
+		"title":   "Login",
 		"siteKey": siteKey,
 	}
 	c.HTML(
@@ -45,13 +47,11 @@ func ViewLoginPage(c *gin.Context) {
 }
 
 func LoginPage(c *gin.Context) {
-	logger.Info(
-		"LoginPage - Page Accessed",
-	)
 	if middlewares.IsLogged(c) {
 		logger.Warn(
 			"LoginPage - User already logged in",
-		
+			"username", middlewares.GetUserData(c),
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -66,7 +66,7 @@ func LoginPage(c *gin.Context) {
 	remember := c.PostForm("remember")
 	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 
-	usernameErr, passwordErr := utils.ValidateLoginInput(username, password)
+	usernameErr, passwordErr := utils.ValidateLoginInput(username, password, c)
 	var usernameCheckErr, passwordCheckErr error
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -81,7 +81,7 @@ func LoginPage(c *gin.Context) {
 				usernameCheckErr = err
 				mu.Unlock()
 			}
-		}() 
+		}()
 	}
 
 	if passwordErr == "" {
@@ -94,22 +94,32 @@ func LoginPage(c *gin.Context) {
 				mu.Unlock()
 			}
 		}()
-	
+
 	}
 	wg.Wait()
 
 	if usernameCheckErr != nil {
-		logger.Warn("LoginPage - Username not found", "username", username)
+		logger.Warn(
+			"LoginPage - Username not found",
+			"Username Inputted", username,
+			"client IP", c.ClientIP(),
+		)
 		usernameErr = "Username not found"
 	}
 
 	if passwordCheckErr != nil {
-		logger.Warn("LoginPage - Password is incorrect", "username", username)
+		logger.Warn(
+			"LoginPage - Password is incorrect",
+			"client IP", c.ClientIP(),
+		)
 		passwordErr = "Password is incorrect"
 	}
 
 	if !utils.IsValidReCAPTCHA(c) {
-		logger.Warn("LoginPage - Invalid ReCAPTCHA")
+		logger.Warn(
+			"LoginPage - Invalid ReCAPTCHA",
+			"client IP", c.ClientIP(),
+		)
 		captchaErr = "Invalid ReCAPTCHA"
 	}
 
@@ -121,6 +131,8 @@ func LoginPage(c *gin.Context) {
 		}
 		logger.Info(
 			"LoginPage - User logged in",
+			"username", username,
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -129,17 +141,14 @@ func LoginPage(c *gin.Context) {
 		)
 		return
 	}
-	logger.Info(
-		"LoginPage - Rendering Login Page",
-	)
-	context := gin.H {
-		"title": "Login",
+	context := gin.H{
+		"title":       "Login",
 		"usernameErr": usernameErr,
 		"passwordErr": passwordErr,
-		"captchaErr": captchaErr,
-		"username": username,
-		"password": password,
-		"siteKey": siteKey,
+		"captchaErr":  captchaErr,
+		"username":    username,
+		"password":    password,
+		"siteKey":     siteKey,
 	}
 	c.HTML(
 		http.StatusOK,
@@ -149,15 +158,15 @@ func LoginPage(c *gin.Context) {
 }
 
 func LogoutPage(c *gin.Context) {
+	username := middlewares.GetUserData(c)
 	logger.Info(
-		"LogoutPage - Page Accessed",
+		"LogoutPage - User logged out",
+		"username", username,
+		"client IP", c.ClientIP(),
+		"action", "redirecting to login page",
 	)
 	middlewares.DeleteSession(c)
 	middlewares.DeleteCookie(c)
-	logger.Info(
-		"LogoutPage - User logged out",
-		"action", "redirecting to login page",
-	)
 	c.Redirect(
 		http.StatusFound,
 		"/electivote/login-page/",
@@ -165,12 +174,12 @@ func LogoutPage(c *gin.Context) {
 }
 
 func ViewForgotPasswordPage(c *gin.Context) {
-	logger.Info(
-		"ViewForgotPasswordPage - Page Accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ViewForgotPasswordPage - User already logged in",
+			"username", username,
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -181,8 +190,9 @@ func ViewForgotPasswordPage(c *gin.Context) {
 	}
 	logger.Info(
 		"ViewForgotPasswordPage - Rendering Forgot Password Page",
+		"Client IP", c.ClientIP(),
 	)
-	context := gin.H {
+	context := gin.H{
 		"title": "Forgot Password",
 	}
 	c.HTML(
@@ -199,13 +209,13 @@ func verifyResetToken(tokenString string) (string, error) {
 
 	if err != nil || !token.Valid {
 		logger.Warn("verifyResetToken - Invalid or expired token")
-		return "", fmt.Errorf("Invalid or expired token")
+		return "", fmt.Errorf("invalid or expired token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		logger.Warn("verifyResetToken - Invalid token claims")
-		return "", fmt.Errorf("Invalid token claims")
+		return "", fmt.Errorf("invalid token claims")
 	}
 	logger.Info("verifyResetToken - Token verified")
 	userEmail := claims["email"].(string)
@@ -213,38 +223,57 @@ func verifyResetToken(tokenString string) (string, error) {
 }
 
 func ForgotPasswordPage(c *gin.Context) {
-	logger.Info(
-		"ForgotPasswordPage - Page Accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ForgotPasswordPage - User already logged in",
+			"username", username,
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(http.StatusFound, "/electivote/home-page/")
 		return
 	}
 
+	logger.Info(
+		"ForgotPasswordPage - Forgot Password page accessed",
+		"Client IP", c.ClientIP(),
+	)
+
 	email := c.PostForm("email")
 	emailErr := ""
 	if len(email) == 0 {
-		logger.Warn("ForgotPasswordPage - Email must be filled")
+		logger.Warn(
+			"ForgotPasswordPage - Email must be filled",
+			"Client IP", c.ClientIP(),
+		)
 		emailErr = "Email must be filled"
 	}
 
 	if !utils.IsValidEmail(email) {
-		logger.Warn("ForgotPasswordPage - Email is not valid")
+		logger.Warn(
+			"ForgotPasswordPage - Email is not valid",
+			"Email Inputted", email,
+			"Client IP", c.ClientIP(),
+		)
 		emailErr = "Email is not valid"
 	}
 
 	_, err := repositories.GetUserByEmail(email)
 	if err != nil {
-		logger.Warn("ForgotPasswordPage - Email not found")
+		logger.Warn(
+			"ForgotPasswordPage - Email not found",
+			"Email Inputted", email,
+			"Client IP", c.ClientIP(),
+		)
 		emailErr = "Email not found"
 	}
 
 	if emailErr != "" {
-		logger.Info("ForgotPasswordPage - Rendering Forgot Password Page")
+		logger.Info(
+			"ForgotPasswordPage - Rendering Forgot Password Page",
+			"Client IP", c.ClientIP(),
+		)
 		context := gin.H{
 			"title":    "Forgot Password",
 			"emailErr": emailErr,
@@ -256,7 +285,10 @@ func ForgotPasswordPage(c *gin.Context) {
 
 	tokenString, err := utils.GenerateResetToken(email)
 	if err != nil {
-		logger.Error("ForgotPasswordPage - Internal Server Error")
+		logger.Error(
+			"ForgotPasswordPage - Internal Server Error",
+			"error", err,
+		)
 		utils.RenderError(c, http.StatusInternalServerError, "Internal Server Error", "/electivote/home-page/")
 		return
 	}
@@ -305,8 +337,8 @@ func ForgotPasswordPage(c *gin.Context) {
     </body>
     </html>
 `, resetURL)
-	subject := "Reset your password"
 
+	subject := "Reset your password"
 	go func() {
 		err = utils.SendEmail(email, emailProvider, body, subject)
 		if err != nil {
@@ -318,18 +350,19 @@ func ForgotPasswordPage(c *gin.Context) {
 	}()
 	logger.Info(
 		"ForgotPasswordPage - Email sent",
+		"client IP", c.ClientIP(),
 		"action", "redirecting to login page",
 	)
 	c.Redirect(http.StatusFound, "/electivote/login-page/")
 }
 
 func ViewResetPasswordPage(c *gin.Context) {
-	logger.Info(
-		"ViewResetPasswordPage - Page Accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ViewResetPasswordPage - User already logged in",
+			"username", username,
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -338,12 +371,19 @@ func ViewResetPasswordPage(c *gin.Context) {
 		)
 		return
 	}
+
+	logger.Info(
+		"ViewResetPasswordPage - Rendering Reset Password Page",
+		"Client IP", c.ClientIP(),
+	)
+
 	token := c.Param("token")
 	email, err := verifyResetToken(token)
 	if err != nil {
 		logger.Error(
 			"ViewResetPasswordPage - Invalid Token",
 			"error", err,
+			"client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -353,8 +393,7 @@ func ViewResetPasswordPage(c *gin.Context) {
 		)
 		return
 	}
-	logger.Info("ViewResetPasswordPage - Rendering Reset Password Page")
-	context := gin.H {
+	context := gin.H{
 		"title": "Reset Password",
 		"email": email,
 		"token": token,
@@ -367,12 +406,12 @@ func ViewResetPasswordPage(c *gin.Context) {
 }
 
 func ResetPasswordPage(c *gin.Context) {
-	logger.Info(
-		"ResetPasswordPage - Page Accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ResetPasswordPage - User already logged in",
+			"username", username,
+			"client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -386,6 +425,7 @@ func ResetPasswordPage(c *gin.Context) {
 	if err != nil {
 		logger.Error(
 			"ResetPasswordPage - Invalid Token",
+			"client IP", c.ClientIP(),
 			"error", err,
 		)
 		utils.RenderError(
@@ -401,22 +441,27 @@ func ResetPasswordPage(c *gin.Context) {
 	passwordErr := ""
 
 	if len(password) == 0 {
-		logger.Warn("ResetPasswordPage - Password must be filled")
+		logger.Warn(
+			"ResetPasswordPage - Password must be filled",
+			"client IP", c.ClientIP(),
+		)
 		passwordErr = "Password must be filled"
 	}
 
 	if len(password) < 5 || len(password) > 255 {
-		logger.Warn("ResetPasswordPage - Password must be between 5 and 255 characters")
+		logger.Warn(
+			"ResetPasswordPage - Password must be between 5 and 255 characters",
+			"client IP", c.ClientIP(),
+		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
 	if passwordErr != "" {
-		logger.Info("ResetPasswordPage - Rendering Reset Password Page")
-		context := gin.H {
-			"title": "Reset Password",
+		context := gin.H{
+			"title":       "Reset Password",
 			"passwordErr": passwordErr,
-			"email": email,
-			"token": token,
+			"email":       email,
+			"token":       token,
 		}
 		c.HTML(
 			http.StatusOK,
@@ -429,6 +474,7 @@ func ResetPasswordPage(c *gin.Context) {
 	if err != nil {
 		logger.Error(
 			"ResetPasswordPage - Internal Server Error",
+			"client IP", c.ClientIP(),
 			"error", err,
 		)
 		utils.RenderError(
@@ -443,6 +489,7 @@ func ResetPasswordPage(c *gin.Context) {
 	if err != nil {
 		logger.Error(
 			"ResetPasswordPage - Internal Server Error",
+			"client IP", c.ClientIP(),
 			"error", err,
 		)
 		utils.RenderError(
@@ -454,7 +501,8 @@ func ResetPasswordPage(c *gin.Context) {
 		return
 	}
 	logger.Info(
-		"ResetPasswordPage - Password reset",
+		"ResetPasswordPage - Password has been reset",
+		"client IP", c.ClientIP(),
 		"action", "redirecting to login page",
 	)
 	c.Redirect(

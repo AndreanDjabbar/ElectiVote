@@ -16,13 +16,10 @@ import (
 var logger *slog.Logger = config.SetUpLogger()
 
 func ViewAddCandidatePage(c *gin.Context) {
-	logger.Info(
-		"ViewAddCandidatePage - Page Accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ViewAddCandidatePage - User not logged in",
-			"method", c.Request.Method,
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -37,6 +34,7 @@ func ViewAddCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		logger.Warn(
 			"ViewAddCandidatePage - User not authorized",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -47,6 +45,7 @@ func ViewAddCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"ViewAddCandidatePage - Rendering Page",
+		"Client IP", c.ClientIP(),
 	)
 	context := gin.H {
 		"title": "Add Candidate",
@@ -60,12 +59,10 @@ func ViewAddCandidatePage(c *gin.Context) {
 }
 
 func AddCandidatePage(c *gin.Context) {
-	logger.Info(
-		"AddCandidatePage - Page Accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"AddCandidatePage - User not logged in",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -80,6 +77,7 @@ func AddCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) {
 		logger.Warn(
 			"AddCandidatePage - User not authorized",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -96,14 +94,13 @@ func AddCandidatePage(c *gin.Context) {
 	if len(candidateName) < 3 {
 		logger.Warn(
 			"AddCandidatePage - Invalid Input",
+			"Client IP", c.ClientIP(),
+			"Candidate Name Inputted", candidateName,
 		)
 		candidateNameErr = "Candidate name must be at least 3 characters"
 	}
 
 	if candidateNameErr != "" {
-		logger.Warn(
-			"AddCandidatePage - Rendering Page with Error Message",
-		)
 		context := gin.H {
 			"title": "Add Candidate",
 			"voteID": voteID,
@@ -125,6 +122,7 @@ func AddCandidatePage(c *gin.Context) {
 			logger.Error(
 				"AddCandidatePage - Error Uploading Picture",
 				"error",candidatePictureErr.Error(),
+				"Client IP", c.ClientIP(),
 			)
 			utils.RenderError(
 				c,
@@ -141,6 +139,7 @@ func AddCandidatePage(c *gin.Context) {
 			logger.Error(
 				"AddCandidatePage - Error Saving Picture",
 				"error", err.Error(),
+				"Client IP", c.ClientIP(),
 			)
 			utils.RenderError(
 				c,
@@ -149,9 +148,6 @@ func AddCandidatePage(c *gin.Context) {
 				"/electivote/add-candidate-page/"+strconv.Itoa(voteID),
 			)
 		}
-		logger.Info(
-			"AddCandidatePage - Picture Uploaded",
-		)
 		newCandidate.CandidatePicture = candidatePicture.Filename
 	}
 	_, err := repositories.AddCandidate(newCandidate)
@@ -159,6 +155,7 @@ func AddCandidatePage(c *gin.Context) {
 		logger.Error(
 			"AddCandidatePage - Error Adding Candidate",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -169,6 +166,7 @@ func AddCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"AddCandidatePage - Candidate Added",
+		"Client IP", c.ClientIP(),
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
@@ -178,12 +176,10 @@ func AddCandidatePage(c *gin.Context) {
 }
 
 func ViewManageCandidatePage(c *gin.Context) {
-	logger.Info(
-		"ViewManageCandidatePage - Page Accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ViewManageCandidatePage - User not logged in",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -200,6 +196,7 @@ func ViewManageCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"ViewManageCandidatePage - User not authorized",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -214,6 +211,7 @@ func ViewManageCandidatePage(c *gin.Context) {
 		logger.Error(
 			"ViewManageCandidatePage - Error Getting Candidate",
 			"Error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -225,6 +223,7 @@ func ViewManageCandidatePage(c *gin.Context) {
 
 	logger.Info(
 		"ViewManageCandidatePage - Rendering Page",
+		"Client IP", c.ClientIP(),
 	)
 	context := gin.H {
 		"title": "Manage Candidate",
@@ -240,12 +239,10 @@ func ViewManageCandidatePage(c *gin.Context) {
 }
 
 func ManageCandidatePage(c *gin.Context) {
-	logger.Info(
-		"ManageCandidatePage - Page Accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ManageCandidatePage - User not logged in",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -262,6 +259,7 @@ func ManageCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"ManageCandidatePage - User not authorized",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -276,6 +274,7 @@ func ManageCandidatePage(c *gin.Context) {
 		logger.Error(
 			"ManageCandidatePage - Error Getting Candidate",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -293,15 +292,12 @@ func ManageCandidatePage(c *gin.Context) {
 	if len(candidateName) < 3 {
 		logger.Warn(
 			"ManageCandidatePage - Invalid Input",
+			"Client IP", c.ClientIP(),
 		)
 		candidateNameErr = "Candidate name must be at least 3 characters"
 	}
 
 	if candidateNameErr != "" {
-		logger.Warn(
-			"ManageCandidatePage - Invalid Input",
-			"action", "rendering page with error message",
-		)
 		context := gin.H {
 			"title": "Manage Candidate",
 			"voteID": voteID,
@@ -342,6 +338,7 @@ func ManageCandidatePage(c *gin.Context) {
 			logger.Error(
 				"ManageCandidatePage - Error Saving Picture",
 				"error", err.Error(),
+				"Client IP", c.ClientIP(),
 			)
 			utils.RenderError(
 				c,
@@ -358,6 +355,7 @@ func ManageCandidatePage(c *gin.Context) {
 		logger.Error(
 			"ManageCandidatePage - Error Updating Candidate",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -368,6 +366,7 @@ func ManageCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"ManageCandidatePage - Candidate Updated",
+		"Client IP", c.ClientIP(),
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
@@ -377,12 +376,10 @@ func ManageCandidatePage(c *gin.Context) {
 }
 
 func ViewDeleteCandidatePage(c *gin.Context) {
-	logger.Info(
-		"ViewDeleteCandidatePage - Page Accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ViewDeleteCandidatePage - User not logged in",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -399,6 +396,7 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"ViewDeleteCandidatePage - User not authorized",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -413,6 +411,7 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 		logger.Error(
 			"ViewDeleteCandidatePage - Error Getting Candidate",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -423,6 +422,7 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"ViewDeleteCandidatePage - Rendering Page",
+		"Client IP", c.ClientIP(),
 	)
 	context := gin.H {
 		"title": "Delete Candidate",
@@ -438,12 +438,10 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 }
 
 func DeleteCandidatePage(c *gin.Context) {
-	logger.Info(
-		"DeleteCandidatePage - Page Accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"DeleteCandidatePage - User not logged in",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -460,6 +458,7 @@ func DeleteCandidatePage(c *gin.Context) {
 	if !repositories.IsValidVoteModerator(username, uint(voteID)) || !repositories.IsValidCandidateModerator(username, uint(candidateID)) {
 		logger.Warn(
 			"DeleteCandidatePage - User not authorized",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -473,6 +472,7 @@ func DeleteCandidatePage(c *gin.Context) {
 		logger.Error(
 			"DeleteCandidatePage - Error Deleting Candidate",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(
 			c,
@@ -483,6 +483,7 @@ func DeleteCandidatePage(c *gin.Context) {
 	}
 	logger.Info(
 		"DeleteCandidatePage - Candidate Deleted",
+		"Client IP", c.ClientIP(),
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(

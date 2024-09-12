@@ -13,13 +13,13 @@ import (
 )
 
 func ViewRegisterPage(c *gin.Context) {
-	logger.Info(
-		"ViewRegisterPage - page accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ViewRegisterPage - User is already logged in",
-			"action", "redirecting to home page",
+			"Username", username,
+			"Client IP", c.ClientIP(),
+			"Action", "redirecting to home page",
 		)
 		c.Redirect(
 			http.StatusFound,
@@ -30,6 +30,7 @@ func ViewRegisterPage(c *gin.Context) {
 
 	logger.Info(
 		"ViewRegisterPage - rendering register page",
+		"Client IP", c.ClientIP(),
 	)
 	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 	context := gin.H {
@@ -44,12 +45,12 @@ func ViewRegisterPage(c *gin.Context) {
 }
 
 func RegisterPage(c *gin.Context) {
-	logger.Info(
-		"RegisterPage - page accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"RegisterPage - User is already logged in",
+			"Username", username,
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -65,7 +66,7 @@ func RegisterPage(c *gin.Context) {
 	email := c.PostForm("email")
 	siteKey := os.Getenv("RECAPTCHA_SITE_KEY")
 
-	usernameErr, passwordErr, password2Err, emailErr := utils.ValidateRegisterInput(username, password, password2, email)
+	usernameErr, passwordErr, password2Err, emailErr := utils.ValidateRegisterInput(username, password, password2, email, c)
 	captchaErr := ""
 
 	emailDomain := utils.GetEmailDomain(email)
@@ -75,6 +76,7 @@ func RegisterPage(c *gin.Context) {
 		logger.Error(
 			"RegisterPage - failed to generate OTP",
 			"error", err.Error(),
+			"clientIP", c.ClientIP(),
 		)
 		emailErr = "Failed to generate OTP"
 	}
@@ -82,6 +84,7 @@ func RegisterPage(c *gin.Context) {
 	if !utils.IsValidReCAPTCHA(c) {
 		logger.Warn(
 			"RegisterPage - Invalid ReCAPTCHA",
+			"clientIP", c.ClientIP(),
 		)
 		captchaErr = "Invalid ReCAPTCHA"
 	}
@@ -92,6 +95,7 @@ func RegisterPage(c *gin.Context) {
 			logger.Error(
 				"RegisterPage - failed to hash password",
 				"error", hashErr.Error(),
+				"clientIP", c.ClientIP(),
 			)
 			utils.RenderError(c, http.StatusInternalServerError, hashErr.Error(), "/electivote/register-page/")
 			return
@@ -138,12 +142,14 @@ func RegisterPage(c *gin.Context) {
 			if err != nil {
 				logger.Error(
 					"RegisterPage - failed to send email",
+					"Client IP", c.ClientIP(),
 					"error", err.Error(),
 				)
 			}
 		}()
 		logger.Info(
 			"RegisterPage - email sent",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to verify email page",
 		)
 		middlewares.SetRegisterSession(c, username, email, hashedPassword, otp)
@@ -153,10 +159,6 @@ func RegisterPage(c *gin.Context) {
 		)
 		return
 	}
-
-	logger.Info(
-		"RegisterPage - rendering register page with error messages",
-	)
 	context := gin.H{
 		"title":       "Register",
 		"usernameErr": usernameErr,
@@ -178,9 +180,6 @@ func RegisterPage(c *gin.Context) {
 }
 
 func registerUser(c *gin.Context, username string, password string, email string) {
-	logger.Info(
-		"registerUser - registering user",
-	)
 	newUser := factories.CreateUser(username, password, email, "user")
 
 	_, err := repositories.RegisterUser(newUser)
@@ -188,6 +187,7 @@ func registerUser(c *gin.Context, username string, password string, email string
 		logger.Error(
 			"registerUser - failed to register user",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
 		return
@@ -198,6 +198,7 @@ func registerUser(c *gin.Context, username string, password string, email string
 		logger.Error(
 			"registerUser - failed to get user ID",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
 		return
@@ -209,6 +210,7 @@ func registerUser(c *gin.Context, username string, password string, email string
 		logger.Error(
 			"registerUser - failed to create profile",
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
 		)
 		utils.RenderError(c, http.StatusInternalServerError, err.Error(), "/electivote/register-page/")
 		return
@@ -216,12 +218,12 @@ func registerUser(c *gin.Context, username string, password string, email string
 }
 
 func ViewVerifyEmailPage(c *gin.Context) {
-	logger.Info(
-		"ViewVerifyEmailPage - page accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"ViewVerifyEmailPage - User is already logged in",
+			"Username", username,
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -237,6 +239,7 @@ func ViewVerifyEmailPage(c *gin.Context) {
 	if otp == nil {
 		logger.Warn(
 			"ViewVerifyEmailPage - OTP is not found",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to register page",
 		)
 		c.Redirect(
@@ -248,6 +251,7 @@ func ViewVerifyEmailPage(c *gin.Context) {
 
 	logger.Info(
 		"ViewVerifyEmailPage - rendering verify email page",
+		"Client IP", c.ClientIP(),
 	)
 	context := gin.H {
 		"title": "Verify Email",
@@ -260,12 +264,12 @@ func ViewVerifyEmailPage(c *gin.Context) {
 }
 
 func VerifyEmailPage(c *gin.Context) {
-	logger.Info(
-		"VerifyEmailPage - page accessed",
-	)
 	if middlewares.IsLogged(c) {
+		username := middlewares.GetUserData(c)
 		logger.Warn(
 			"VerifyEmailPage - User is already logged in",
+			"Username", username,
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -286,6 +290,7 @@ func VerifyEmailPage(c *gin.Context) {
 	if otp == nil {
 		logger.Warn(
 			"VerifyEmailPage - OTP is not found",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to register page",
 		)
 		c.Redirect(
@@ -299,6 +304,7 @@ func VerifyEmailPage(c *gin.Context) {
 	if otpInput == "" {
 		logger.Warn(
 			"VerifyEmailPage - OTP is not filled",
+			"Client IP", c.ClientIP(),
 		)
 		otpErr = "OTP must be filled"
 	}
@@ -306,6 +312,7 @@ func VerifyEmailPage(c *gin.Context) {
 	if otpInput != otp {
 		logger.Warn(
 			"VerifyEmailPage - Invalid OTP",
+			"Client IP", c.ClientIP(),
 		)
 		otpErr = "Invalid OTP"
 	}
@@ -320,6 +327,7 @@ func VerifyEmailPage(c *gin.Context) {
 	if time.Now().Unix() > otpCreatedAt.(int64) + int64(expirationTime) {
 		logger.Warn(
 			"VerifyEmailPage - OTP is expired",
+			"Client IP", c.ClientIP(),
 		)
 		middlewares.DeleteRegisterSession(c)
 		c.HTML(
@@ -331,9 +339,6 @@ func VerifyEmailPage(c *gin.Context) {
 	}
 
 	if otpErr != "" {
-		logger.Info(
-			"VerifyEmailPage - rendering verify email page with error messages",
-		)
 		context := gin.H{
 			"title": "Verify Email",
 			"otpErr": otpErr,
@@ -347,6 +352,7 @@ func VerifyEmailPage(c *gin.Context) {
 	}
 	logger.Info(
 		"VerifyEmailPage - OTP is valid",
+		"Client IP", c.ClientIP(),
 		"action", "registering user and redirecting to login page",
 	)
 	registerUser(c, username.(string), password.(string), email.(string))

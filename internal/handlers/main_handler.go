@@ -7,12 +7,10 @@ import (
 )
 
 func ViewHomePage(c *gin.Context) {
-	logger.Info(
-		"ViewHomePage - page accessed",
-	)
 	if !middlewares.IsLogged(c) {
 		logger.Warn(
 			"ViewHomePage - User is not logged in",
+			"Client IP", c.ClientIP(),
 			"action", "redirecting to login page",
 		)
 		c.Redirect(
@@ -22,14 +20,15 @@ func ViewHomePage(c *gin.Context) {
 		return
 	}
 
-	dataUser := middlewares.GetUserData(c)
+	username := middlewares.GetUserData(c)
 
 	logger.Info(
 		"ViewHomePage - rendering home page",
+		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Home",
-		"dataUser": dataUser,
 	}
 	c.HTML(
 		http.StatusOK,
