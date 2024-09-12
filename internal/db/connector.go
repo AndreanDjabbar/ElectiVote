@@ -36,13 +36,18 @@ func ConnectToDatabase() {
 		logger.Error("Error connecting to database", "error", err)
 		panic(err.Error())
 	}
-	database.AutoMigrate(
+	err = database.AutoMigrate(
 		&models.User{},
 		&models.Profile{},
 		&models.Vote{},
 		&models.Candidate{},
 		&models.VoteRecord{},
 	)
+	if err != nil {
+		logger.Error("Error migrating database", "error", err)
+		panic(err.Error())
+	}
+	
 	DB = database
 	logger.Info("Database connected")
 }
