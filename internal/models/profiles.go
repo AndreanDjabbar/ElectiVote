@@ -3,13 +3,8 @@ package models
 import (
 	"database/sql/driver"
 	"fmt"
-	"log/slog"
 	"time"
-
-	"github.com/AndreanDjabbar/ElectiVote/config"
 )
-
-var logger *slog.Logger = config.SetUpLogger()
 
 type Profile struct {
 	ProfileID   uint     `gorm:"primary_key"`
@@ -40,10 +35,6 @@ func (nt *NullTime) Scan(value interface{}) error {
 	case []uint8:
 		t, err := time.Parse("2006-01-02", string(v))
 		if err != nil {
-			logger.Error(
-				"Profiles - Error Parsing Time",
-				"error", err,
-			)
 			return err
 		}
 		nt.Time = t
