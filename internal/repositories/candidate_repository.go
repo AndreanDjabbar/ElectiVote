@@ -1,14 +1,9 @@
 package repositories
 
 import (
-	"log/slog"
-
-	"github.com/AndreanDjabbar/ElectiVote/config"
 	"github.com/AndreanDjabbar/ElectiVote/internal/db"
 	"github.com/AndreanDjabbar/ElectiVote/internal/models"
 )
-
-var logger *slog.Logger = config.SetUpLogger()
 
 func AddCandidate(newCandidate models.Candidate) (models.Candidate, error) {
 	err := db.DB.Create(&newCandidate).Error
@@ -36,24 +31,14 @@ func GetVoteIDByCandidateID(candidateID uint) (uint, error) {
 func IsValidCandidateModerator(username string, candidateID uint) bool {
 	userID, err := GetUserIdByUsername(username)
 	if err != nil {
-		logger.Error(
-			"Candidate Repository - Error Get User ID By Username",
-			"error", err,
-		)
 		return false
 	}
 	userVoteID, err := GetVoteIDByUserID(uint(userID))
 	if err != nil {
-		logger.Error(
-			"Candidate Repository - Error Get Vote ID By User ID",
-		)
 		return false
 	}
 	candidateVoteID, err := GetVoteIDByCandidateID(candidateID)
 	if err != nil {
-		logger.Error(
-			"Candidate Repository - Error Get Vote ID By Candidate ID",
-		)
 		return false
 	}
 	if userVoteID == candidateVoteID {
@@ -76,10 +61,6 @@ func IncrementCandidateVote(candidateID uint) error {
 	candidate := models.Candidate{}
 	err := db.DB.Where("candidate_id = ?", candidateID).Find(&candidate).Error
 	if err != nil {
-		logger.Error(
-			"Candidate Repository - Error Increment Candidate Vote",
-			"error", err,
-		)
 		return err
 	}
 	candidate.TotalVotes += 1
