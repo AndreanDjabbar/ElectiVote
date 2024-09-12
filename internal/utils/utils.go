@@ -41,10 +41,6 @@ func GenerateSecureToken(username string) (string, error) {
 func ExtractUsername(token string) (string, error) {
 	parts := strings.Split(token, ":")
 	if len(parts) != 3 {
-		logger.Error(
-			"ExtractUsername - invalid token format",
-			"error", fmt.Errorf("invalid token format"),
-		)
 		return "", fmt.Errorf("invalid token format")
 	}
 
@@ -54,10 +50,6 @@ func ExtractUsername(token string) (string, error) {
 	expectedSignature := hex.EncodeToString(h.Sum(nil))
 
 	if !hmac.Equal([]byte(expectedSignature), []byte(parts[2])) {
-		logger.Error(
-			"ExtractUsername - invalid token signature",
-			"error", fmt.Errorf("invalid token signature"),
-		)
 		return "", fmt.Errorf("invalid token signature")
 	}
 
@@ -73,63 +65,99 @@ func IsValidEmail(email string) bool {
 func HashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
-		logger.Error(
-			"HashPassword - error hashing password",
-			"error", err,
-		)
         return "", err
     }
     return string(hashedPassword), nil
 } 
 
-func ValidateLoginInput(username, password string) (string, string) {
+func ValidateLoginInput(username, password string, c *gin.Context) (string, string) {
 	usernameErr, passwordErr := "", ""
 
 	if username == "" {
 		usernameErr = "Username Must be Filled"
+		logger.Warn(
+			"ValidateLoginInput - username must be filled",
+			"Inputted Username", username,
+			"Client IP", c.ClientIP(),
+		)
 	}
 
 	if password == "" {
+		logger.Warn(
+			"ValidateLoginInput - password must be filled",
+			"Client IP", c.ClientIP(),
+		)
 		passwordErr = "Password Must be Filled"
 	}
 
 	if len(username) != 0 && (len(username) < 5 || len(username) > 255) {
+		logger.Warn(
+			"ValidateLoginInput - username must be between 5 and 255 characters",
+			"Inputted Username", username,
+			"Client IP", c.ClientIP(),
+		)
 		usernameErr = "Username must be between 5 and 255 characters"
 	}
 
 	if len(password) != 0 && (len(password) < 5 || len(password) > 255) {
+		logger.Warn(
+			"ValidateLoginInput - password must be between 5 and 255 characters",
+			"Client IP", c.ClientIP(),
+		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
 	return usernameErr, passwordErr
 }
 
-func ValidateRegisterInput(username, password, password2, email string) (string, string, string, string) {
+func ValidateRegisterInput(username, password, password2, email string, c *gin.Context) (string, string, string, string) {
 	usernameErr, passwordErr, password2Err,  emailErr := "", "", "", ""
 
 	if username == "" {
+		logger.Warn(
+			"ValidateRegisterInput - username must be filled",
+			"Client IP", c.ClientIP(),
+		)
 		usernameErr = "Username must be filled"
 	}
 
 	if password == "" {
+		logger.Warn(
+			"ValidateRegisterInput - password must be filled",
+			"Client IP", c.ClientIP(),
+		)
 		passwordErr = "Password must be filled"
 	}
 
 	if password2 == "" {
+		logger.Warn(
+			"ValidateRegisterInput - password confirmation must be filled",
+			"Client IP", c.ClientIP(),
+		)
 		password2Err = "Password Confirmation must be filled"
 	}
 
 	if password2 != "" && password != password2 {
+		logger.Warn(
+			"ValidateRegisterInput - password and password confirmation must be same",
+			"Client IP", c.ClientIP(),
+		)
 		password2Err = "Password and Password Confirmation must be same"
 	}
 
 	if email == "" {
+		logger.Warn(
+			"ValidateRegisterInput - email must be filled",
+			"Client IP", c.ClientIP(),
+		)
 		emailErr = "Email must be filled"
 	}
 
 	if len(username) != 0 && (len(username) < 5 || len(username) > 255) {
 		logger.Warn(
 			"ValidateRegisterInput - username must be between 5 and 255 characters",
+			"Inputted Username", username,
+			"Client IP", c.ClientIP(),
 		)
 		usernameErr = "Username must be between 5 and 255 characters"
 	}
@@ -137,15 +165,25 @@ func ValidateRegisterInput(username, password, password2, email string) (string,
 	if len(password) != 0 && (len(password) < 5 || len(password) > 255) {
 		logger.Warn(
 			"ValidateRegisterInput - password must be between 5 and 255 characters",
+			"Client IP", c.ClientIP(),
 		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
 	if len(password2) != 0 && (len(password2) < 5 || len(password2) > 255) {
+		logger.Warn(
+			"ValidateRegisterInput - password confirmation must be between 5 and 255 characters",
+			"Client IP", c.ClientIP(),
+		)
 		passwordErr = "Password must be between 5 and 255 characters"
 	}
 
 	if email != "" && !IsValidEmail(email) {
+		logger.Warn(
+			"ValidateRegisterInput - email must contain @ and end with .com or .co.id",
+			"Inputted Email", email,
+			"Client IP", c.ClientIP(),
+		)
 		emailErr = "Email must contain @ and end with .com or .co.id"
 	}
 	
@@ -157,22 +195,42 @@ func IsValidPhoneNumber(phone string) bool {
 	return isValid
 }
 
-func ValidateProfileInput(firstName, lastname, phone string, age uint) (string, string, string, string) {
+func ValidateProfileInput(firstName, lastname, phone string, age uint, c *gin.Context) (string, string, string, string) {
 	firstNameErr, lastNameErr, phoneErr, ageErr :=  "", "", "", ""
 
 	if firstName != "" && (len(firstName) < 5 || len(firstName) > 255) {
+		logger.Warn(
+			"ValidateProfileInput - first name must be between 5 and 255 characters",
+			"Inputted First Name", firstName,
+			"Client IP", c.ClientIP(),
+		)
 		firstNameErr = "First Name must be between 5 and 255 characters"
 	}
 
 	if lastname != "" && (len(lastname) < 5 || len(lastname) > 255) {
+		logger.Warn(
+			"ValidateProfileInput - last name must be between 5 and 255 characters",
+			"Inputted Last Name", lastname,
+			"Client IP", c.ClientIP(),
+		)
 		lastNameErr = "Last Name must be between 5 and 255 characters"
 	}
 
 	if age != 0 && (age <= 5 || age > 100) {
+		logger.Warn(
+			"ValidateProfileInput - age must be between 5 and 100",
+			"Inputted Age", age,
+			"Client IP", c.ClientIP(),
+		)
 		ageErr = "Age must be between 5 and 100"
 	}
 
 	if phone != "" && !IsValidPhoneNumber(phone) {
+		logger.Warn(
+			"ValidateProfileInput - phone number must be a number",
+			"Inputted Phone Number", phone,
+			"Client IP", c.ClientIP(),
+		)
 		phoneErr = "Phone number must be a number"
 	}
 
@@ -300,9 +358,6 @@ func SendEmail(email, emailProvider, body string, subject string) error {
 
     service, exists := services[emailProvider]
     if !exists {
-		logger.Error(
-			"SendEmail - unsupported email provider",
-		)
         return fmt.Errorf("unsupported email provider: %s", emailProvider)
     }
 
@@ -338,7 +393,6 @@ func IsValidReCAPTCHA(c *gin.Context) bool {
 			"IsValidReCAPTCHA - error verifying reCAPTCHA",
 			"error", err,
 		)
-		fmt.Println("Error verifying reCAPTCHA:", err)
 		return false
 	}
 	defer resp.Body.Close()
