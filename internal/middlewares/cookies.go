@@ -40,6 +40,7 @@ func GetCookies(c *gin.Context) string {
 		logger.Error(
 			"GetCookies - error getting cookies",
 			"error", err,
+			"Client IP", c.ClientIP(),
 		)
 		return ""
 	} 
@@ -48,6 +49,7 @@ func GetCookies(c *gin.Context) string {
 		logger.Error(
 			"GetCookies - error extracting username from cookies",
 			"error", err,
+			"Client IP", c.ClientIP(),
 		)
 		return ""
 	}

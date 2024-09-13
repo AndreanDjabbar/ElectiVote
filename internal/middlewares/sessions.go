@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -12,9 +11,6 @@ import (
 var sessionKey string = os.Getenv("SESSION_KEY")
 
 func SetSession(c *gin.Context, value string) {
-	logger.Info(
-		"SetSession - setting session",
-	)
 	session := sessions.Default(c)
 	session.Set(sessionKey, value)
 	session.Save()
@@ -26,6 +22,7 @@ func GetSession(c *gin.Context) string {
 	if value == nil {
 		logger.Warn(
 			"GetSession - session is empty",
+			"Client IP", c.ClientIP(),
 		)
 		return ""
 	}
@@ -49,8 +46,8 @@ func SetRegisterSession(c *gin.Context, username, email, password, otp string) {
 		logger.Error(
 			"SetRegisterSession - error saving session",
 			"error", err,
+			"Client IP", c.ClientIP(),
 		)
-		fmt.Println("Error saving session: ", err)
 	}
 }
 
