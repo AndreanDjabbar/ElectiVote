@@ -74,4 +74,7 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.GET("email-verification-page/", handlers.ViewVerifyEmailPage)
 		mainRouter.POST("email-verification-page/", handlers.VerifyEmailPage)
 	}
+	{
+		mainRouter.GET("vote-history-page/", handlers.ViewVoteHistoryPage)
+	}
 }

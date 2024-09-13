@@ -41,5 +41,4 @@ type Vote struct {
 	ModeratorID     uint
 	User            User                  `gorm:"foreignKey:ModeratorID;constraint:OnDelete:CASCADE;"`
 	Start           CustomTime `gorm:"type:datetime;default:NULL"`
-	End             CustomTime `gorm:"type:datetime;default:NULL"`
 }

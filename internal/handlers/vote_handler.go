@@ -475,7 +475,74 @@ func DeleteVotePage(c *gin.Context) {
 		return
 	}
 
-	err := repositories.DeleteVote(uint(voteID))
+	voteData, err := repositories.GetVoteDataByVoteID(uint(voteID))
+	if err != nil {
+		logger.Error(
+			"DeleteVotePage - failed to get vote data by vote ID",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
+	moderatorName, err := repositories.GetModeratorNameByModeratorID(voteData.ModeratorID)
+	if err != nil {
+		logger.Error(
+			"DeleteVotePage - failed to get moderator name by moderator ID",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
+	candidateWinner, err := repositories.GetCandidateWinner(uint(voteID))
+	if err != nil {
+		logger.Error(
+			"DeleteVotePage - failed to get candidate winner",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+	}
+
+	voteTitle := voteData.VoteTitle
+	voteDescription := voteData.VoteDescription
+	start := voteData.Start
+	candidateWinnerName := candidateWinner.CandidateName
+	candidateWinnerVotes := candidateWinner.TotalVotes
+	candidateWinnerPicture := candidateWinner.CandidatePicture
+	end := models.CustomTime{Time: time.Now()}
+	voteHistory := factories.VoteHistoryFactory(voteData.ModeratorID, candidateWinnerVotes, moderatorName, voteTitle, voteDescription, candidateWinnerName, candidateWinnerPicture, start, end)
+	err = repositories.CreateVoteHistory(voteHistory)
+
+	if err != nil {
+		logger.Error(
+			"DeleteVotePage - failed to create vote history",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/manage-vote-page/",
+		)
+	}
+
+	err = repositories.DeleteVote(uint(voteID))
 	if err != nil {
 		logger.Error(
 			"DeleteVotePage - failed to delete vote",
@@ -964,6 +1031,69 @@ func ViewVoteResultPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"voteResult.html",
+		context,
+	)
+}
+
+func ViewVoteHistoryPage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewVoteHistoryPage - User is not logged in",
+			"Client IP", c.ClientIP(),
+			"action", "redirecting to login page",
+		)
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	username := middlewares.GetUserData(c)
+	userID, err := repositories.GetUserIdByUsername(username)
+	if err != nil {
+		logger.Error(
+			"ViewVoteHistoryPage - failed to get user ID by username",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+	}
+	voteHistories, err := repositories.GetVoteHistoriesByUserID(uint(userID))
+	if err != nil {
+		logger.Error(
+			"ViewVoteHistoryPage - failed to get vote records by user ID",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/home-page/",
+		)
+		return
+	}
+
+	logger.Info(
+		"ViewVoteHistoryPage - rendering vote history page",
+		"Client IP", c.ClientIP(),
+		"Username", username,
+	)
+	context := gin.H {
+		"title": "Vote History",
+		"isExist": len(voteHistories) > 0,
+		"voteHistories": voteHistories,
+	}
+	c.HTML(
+		http.StatusOK,
+		"voteHistory.html",
 		context,
 	)
 }
