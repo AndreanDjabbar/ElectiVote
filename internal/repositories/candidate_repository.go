@@ -16,6 +16,12 @@ func GetCandidatesByVoteID(voteID uint) ([]models.Candidate, error) {
 	return candidates, err
 }
 
+func GetCandidateWinner(voteID uint) (models.Candidate, error) {
+	candidate := models.Candidate{}
+	err := db.DB.Where("vote_id = ?", voteID).Order("total_votes desc").First(&candidate).Error
+	return candidate, err
+}
+
 func GetCandidateByCandidateID(candidateID uint) (models.Candidate, error) {
 	candidate := models.Candidate{}
 	err := db.DB.Where("candidate_id = ?", candidateID).Find(&candidate).Error

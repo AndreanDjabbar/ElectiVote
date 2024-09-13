@@ -59,6 +59,15 @@ func GetModeratorIDByVoteID(voteID uint) (uint, error) {
 	return vote.ModeratorID, nil
 }
 
+func GetModeratorNameByModeratorID(moderatorID uint) (string, error) {
+	user := models.User{}
+	err := db.DB.Where("id = ?", moderatorID).Find(&user).Error
+	if err != nil {
+		return "", err
+	}
+	return user.Username, nil
+}
+
 func IsValidVoteModerator(username string, voteID uint) bool {
 	userID, err := GetUserIdByUsername(username)
 	if err != nil {
