@@ -35,6 +35,7 @@ func ViewAddCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"ViewAddCandidatePage - User not authorized",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -46,6 +47,7 @@ func ViewAddCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ViewAddCandidatePage - Rendering Page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Add Candidate",
@@ -78,6 +80,7 @@ func AddCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"AddCandidatePage - User not authorized",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -95,6 +98,7 @@ func AddCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"AddCandidatePage - Invalid Input",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"Candidate Name Inputted", candidateName,
 		)
 		candidateNameErr = "Candidate name must be at least 3 characters"
@@ -123,6 +127,7 @@ func AddCandidatePage(c *gin.Context) {
 				"AddCandidatePage - Error Uploading Picture",
 				"error",candidatePictureErr.Error(),
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
 			utils.RenderError(
 				c,
@@ -140,6 +145,7 @@ func AddCandidatePage(c *gin.Context) {
 				"AddCandidatePage - Error Saving Picture",
 				"error", err.Error(),
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
 			utils.RenderError(
 				c,
@@ -156,6 +162,7 @@ func AddCandidatePage(c *gin.Context) {
 			"AddCandidatePage - Error Adding Candidate",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -167,6 +174,7 @@ func AddCandidatePage(c *gin.Context) {
 	logger.Info(
 		"AddCandidatePage - Candidate Added",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
@@ -197,6 +205,7 @@ func ViewManageCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"ViewManageCandidatePage - User not authorized",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -212,6 +221,7 @@ func ViewManageCandidatePage(c *gin.Context) {
 			"ViewManageCandidatePage - Error Getting Candidate",
 			"Error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -224,6 +234,7 @@ func ViewManageCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ViewManageCandidatePage - Rendering Page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Manage Candidate",
@@ -260,6 +271,7 @@ func ManageCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"ManageCandidatePage - User not authorized",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -275,6 +287,7 @@ func ManageCandidatePage(c *gin.Context) {
 			"ManageCandidatePage - Error Getting Candidate",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -293,6 +306,7 @@ func ManageCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"ManageCandidatePage - Invalid Input",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		candidateNameErr = "Candidate name must be at least 3 characters"
 	}
@@ -322,6 +336,8 @@ func ManageCandidatePage(c *gin.Context) {
 			logger.Error(
 				"ManageCandidatePage - Error Uploading Picture",
 				"error", candidatePictureErr.Error(),
+				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
 			utils.RenderError(
 				c,
@@ -339,6 +355,7 @@ func ManageCandidatePage(c *gin.Context) {
 				"ManageCandidatePage - Error Saving Picture",
 				"error", err.Error(),
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
 			utils.RenderError(
 				c,
@@ -356,6 +373,7 @@ func ManageCandidatePage(c *gin.Context) {
 			"ManageCandidatePage - Error Updating Candidate",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -367,6 +385,7 @@ func ManageCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ManageCandidatePage - Candidate Updated",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(
@@ -397,6 +416,7 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"ViewDeleteCandidatePage - User not authorized",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -412,6 +432,7 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 			"ViewDeleteCandidatePage - Error Getting Candidate",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -423,6 +444,7 @@ func ViewDeleteCandidatePage(c *gin.Context) {
 	logger.Info(
 		"ViewDeleteCandidatePage - Rendering Page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Delete Candidate",
@@ -459,6 +481,7 @@ func DeleteCandidatePage(c *gin.Context) {
 		logger.Warn(
 			"DeleteCandidatePage - User not authorized",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -473,6 +496,7 @@ func DeleteCandidatePage(c *gin.Context) {
 			"DeleteCandidatePage - Error Deleting Candidate",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -484,6 +508,7 @@ func DeleteCandidatePage(c *gin.Context) {
 	logger.Info(
 		"DeleteCandidatePage - Candidate Deleted",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 		"action", "redirecting to manage vote page",
 	)
 	c.Redirect(

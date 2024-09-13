@@ -62,6 +62,7 @@ func ViewProfilePage(c *gin.Context) {
 			"ViewProfilePage - failed to get user profile",
 			"error", profileErr.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -77,6 +78,7 @@ func ViewProfilePage(c *gin.Context) {
 			"ViewProfilePage - failed to get user email",
 			"error", emailErr.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -90,6 +92,7 @@ func ViewProfilePage(c *gin.Context) {
 	logger.Info(
 		"ViewProfilePage - rendering profile page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	formattedDob := utils.FormattedDob(userProfile.Birthday)
 	context := gin.H{
@@ -155,6 +158,7 @@ func ViewEditProfilePage(c *gin.Context) {
 			"ViewEditProfilePage - failed to get user profile",
 			"error", profileErr.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -170,6 +174,7 @@ func ViewEditProfilePage(c *gin.Context) {
 			"ViewEditProfilePage - failed to get user email",
 			"error", emailErr.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -183,6 +188,7 @@ func ViewEditProfilePage(c *gin.Context) {
 	logger.Info(
 		"ViewEditProfilePage - rendering edit profile page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	formattedDob := utils.FormattedDob(userProfile.Birthday)
 	context := gin.H{
@@ -225,6 +231,7 @@ func EditProfilePage(c *gin.Context) {
 			"EditProfilePage - failed to get user profile",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -249,6 +256,7 @@ func EditProfilePage(c *gin.Context) {
 				"error", err.Error(),
 				"Age Inputted", age,
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
             ageErr = "Age must be a number"
         } else {
@@ -262,6 +270,7 @@ func EditProfilePage(c *gin.Context) {
 			"EditProfilePage - failed to get user email",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -280,6 +289,7 @@ func EditProfilePage(c *gin.Context) {
 				"error", err.Error(),
 				"Date of Birth Inputted", dob,
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
             dobErr = "Date of Birth must be in format YYYY-MM-DD"
             finalDOB = models.NullTime{Valid: false}
@@ -303,6 +313,7 @@ func EditProfilePage(c *gin.Context) {
 					"EditProfilePage - failed to get file",
 					"error", fileErr.Error(),
 					"Client IP", c.ClientIP(),
+					"Username", username,
 				)
 				utils.RenderError(
 					c,
@@ -318,6 +329,7 @@ func EditProfilePage(c *gin.Context) {
 					"EditProfilePage - failed to save file",
 					"error", err.Error(),
 					"Client IP", c.ClientIP(),
+					"Username", username,
 				)
 				utils.RenderError(
 					c,
@@ -333,6 +345,7 @@ func EditProfilePage(c *gin.Context) {
 					"EditProfilePage - failed to update profile",
 					"error", err.Error(),
 					"Client IP", c.ClientIP(),
+					"Username", username,
 				)
 				utils.RenderError(
 					c,
@@ -345,6 +358,7 @@ func EditProfilePage(c *gin.Context) {
 			logger.Info(
 				"EditProfilePage - profile updated",
 				"Client IP", c.ClientIP(),
+				"Username", username,
 				"action", "redirecting to profile page",
 			)
 			c.Redirect(
@@ -360,6 +374,7 @@ func EditProfilePage(c *gin.Context) {
 				"EditProfilePage - failed to update profile",
 				"error", err.Error(),
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
             utils.RenderError(
                 c,
@@ -372,6 +387,7 @@ func EditProfilePage(c *gin.Context) {
 		logger.Info(
 			"EditProfilePage - profile updated",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to profile page",
 		)
         c.Redirect(

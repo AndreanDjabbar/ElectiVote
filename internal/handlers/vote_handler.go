@@ -28,10 +28,11 @@ func ViewCreateVotePage(c *gin.Context) {
 		)
 		return
 	}
-
+	username := middlewares.GetUserData(c)
 	logger.Info(
 		"ViewCreateVotePage - rendering create vote page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Create Vote",
@@ -62,13 +63,13 @@ func CreateVotePage(c *gin.Context) {
 	voteDesc := c.PostForm("voteDesc")
 	voteCode := utils.GenerateVoteCode()
 	start := models.CustomTime{Time: time.Now()}
-
 	moderatorID, err := repositories.GetUserIdByUsername(username)
 	if err != nil {
 		logger.Error(
 			"CreateVotePage - failed to get user ID by username",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -83,6 +84,7 @@ func CreateVotePage(c *gin.Context) {
 			"CreateVotePage - vote title must be at least 5 characters",
 			"Vote Title Inputted", voteTitle,
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		voteTitleErr = "Vote title must be at least 5 characters"
 	}
@@ -96,6 +98,7 @@ func CreateVotePage(c *gin.Context) {
 				"CreateVotePage - failed to create vote",
 				"error", err.Error(),
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
 			utils.RenderError(
 				c,
@@ -108,6 +111,7 @@ func CreateVotePage(c *gin.Context) {
 		logger.Info(
 			"CreateVotePage - vote created",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -149,6 +153,7 @@ func ViewManageVotesPage(c *gin.Context) {
 			"ViewManageVotesPage - failed to get votes data by username",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -161,6 +166,7 @@ func ViewManageVotesPage(c *gin.Context) {
 	logger.Info(
 		"ViewManageVotesPage - rendering manage votes page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Manage Votes",
@@ -193,6 +199,7 @@ func ViewManageVotePage(c *gin.Context) {
 		logger.Warn(
 			"ViewManageVotePage - User is not a valid vote moderator",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -227,6 +234,7 @@ func ViewManageVotePage(c *gin.Context) {
 			"ViewManageVotePage - failed to get vote data by vote ID",
 			"error", voteDataErr.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -242,6 +250,7 @@ func ViewManageVotePage(c *gin.Context) {
 			"ViewManageVotePage - failed to get candidates by vote ID",
 			"error", candidatesErr.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -255,6 +264,7 @@ func ViewManageVotePage(c *gin.Context) {
 	logger.Info(
 		"ViewManageVotePage - rendering manage vote page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H{
 		"title":      "Manage Vote",
@@ -289,6 +299,7 @@ func ManageVotePage(c *gin.Context) {
 		logger.Warn(
 			"ManageVotePage - User is not a valid vote moderator",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -304,6 +315,7 @@ func ManageVotePage(c *gin.Context) {
 			"ManageVotePage - failed to get vote data by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -322,6 +334,7 @@ func ManageVotePage(c *gin.Context) {
 			"ManageVotePage - vote title must be at least 5 characters",
 			"Vote Title Inputted", voteTitle,
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		voteTitleErr = "Vote title must be at least 5 characters"
 	}
@@ -334,6 +347,7 @@ func ManageVotePage(c *gin.Context) {
 				"ManageVotePage - failed to update vote",
 				"error", err.Error(),
 				"Client IP", c.ClientIP(),
+				"Username", username,
 			)
 			utils.RenderError(
 				c,
@@ -346,6 +360,7 @@ func ManageVotePage(c *gin.Context) {
 		logger.Info(
 			"ManageVotePage - vote updated",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to manage vote page",
 		)
 		c.Redirect(
@@ -388,6 +403,7 @@ func ViewDeleteVotePage(c *gin.Context) {
 		logger.Warn(
 			"ViewDeleteVotePage - User is not a valid vote moderator",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -402,6 +418,7 @@ func ViewDeleteVotePage(c *gin.Context) {
 		logger.Error(
 			"ViewDeleteVotePage - failed to get vote data by vote ID",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"error", err.Error(),
 		)
 		utils.RenderError(
@@ -415,6 +432,7 @@ func ViewDeleteVotePage(c *gin.Context) {
 	logger.Info(
 		"ViewDeleteVotePage - rendering delete vote page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Delete Vote",
@@ -447,6 +465,7 @@ func DeleteVotePage(c *gin.Context) {
 		logger.Warn(
 			"DeleteVotePage - User is not a valid vote moderator",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -462,6 +481,7 @@ func DeleteVotePage(c *gin.Context) {
 			"DeleteVotePage - failed to delete vote",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -474,6 +494,7 @@ func DeleteVotePage(c *gin.Context) {
 	logger.Info(
 		"DeleteVotePage - vote deleted",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 		"action", "redirecting to manage votes page",
 	)
 	c.Redirect(
@@ -495,10 +516,11 @@ func ViewJoinVotePage(c *gin.Context) {
 		)
 		return
 	}
-
+	username := middlewares.GetUserData(c)
 	logger.Info(
 		"ViewJoinVotePage - rendering join vote page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Join Vote",
@@ -530,8 +552,9 @@ func JoinVotePage(c *gin.Context) {
 	if err != nil {
 		logger.Error(
 			"JoinVotePage - failed to get user ID by username",
-			"Client IP", c.ClientIP(),
 			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -546,6 +569,7 @@ func JoinVotePage(c *gin.Context) {
 		logger.Warn(
 			"JoinVotePage - user already voted in this vote",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		voteCodeErr = "You already voted in this vote"
 	}
@@ -554,6 +578,7 @@ func JoinVotePage(c *gin.Context) {
 		logger.Warn(
 			"JoinVotePage - vote code must be 6 characters",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		voteCodeErr = "Vote code must be 6 characters"
 	}
@@ -563,6 +588,7 @@ func JoinVotePage(c *gin.Context) {
 		logger.Warn(
 			"JoinVotePage - vote code not found",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		voteCodeErr = "Vote code not found"
 	}
@@ -584,6 +610,7 @@ func JoinVotePage(c *gin.Context) {
 	logger.Info(
 		"JoinVotePage - redirecting to vote page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	c.Redirect(
 		http.StatusFound,
@@ -604,6 +631,7 @@ func ViewVotePage(c *gin.Context) {
 		)
 		return
 	}
+	username := middlewares.GetUserData(c)
 	voteCode := c.Param("voteCode")
 	voteID, err := repositories.GetVoteIDByVoteCode(voteCode)
 	if err != nil {
@@ -611,6 +639,7 @@ func ViewVotePage(c *gin.Context) {
 			"ViewVotePage - failed to get vote ID by vote code",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -626,6 +655,7 @@ func ViewVotePage(c *gin.Context) {
 			"ViewVotePage - failed to get vote data by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -641,6 +671,7 @@ func ViewVotePage(c *gin.Context) {
 			"ViewVotePage - failed to get candidates by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -653,6 +684,7 @@ func ViewVotePage(c *gin.Context) {
 	logger.Info(
 		"ViewVotePage - rendering vote page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Vote",
@@ -681,6 +713,7 @@ func VotePage(c *gin.Context) {
 		)
 		return
 	}
+	username := middlewares.GetUserData(c)
 	votedErr := ""
 	voted := c.PostForm("voted")
 	voteCode := c.Param("voteCode")
@@ -690,6 +723,7 @@ func VotePage(c *gin.Context) {
 			"VotePage - failed to get vote ID by vote code",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -705,6 +739,7 @@ func VotePage(c *gin.Context) {
 			"VotePage - failed to get vote data by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -714,13 +749,13 @@ func VotePage(c *gin.Context) {
 		)
 	}
 
-	username := middlewares.GetUserData(c)
 	userID, err := repositories.GetUserIdByUsername(username)
 	if err != nil {
 		logger.Error(
 			"VotePage - failed to get user ID by username",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -736,6 +771,7 @@ func VotePage(c *gin.Context) {
 			"VotePage - failed to get candidates by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -749,6 +785,7 @@ func VotePage(c *gin.Context) {
 		logger.Warn(
 			"VotePage - please select a candidate",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		votedErr = "Please select a candidate"
 	}
@@ -781,6 +818,7 @@ func VotePage(c *gin.Context) {
 			"VotePage - failed to create vote record",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -797,6 +835,7 @@ func VotePage(c *gin.Context) {
 			"VotePage - failed to increment candidate vote",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -811,6 +850,7 @@ func VotePage(c *gin.Context) {
 		"VotePage - vote recorded",
 		"Client IP", c.ClientIP(),
 		"action", "redirecting to home page",
+		"Username", username,
 	)
 	c.Redirect(
 		http.StatusFound,
@@ -838,6 +878,7 @@ func ViewVoteResultPage(c *gin.Context) {
 		logger.Warn(
 			"ViewVoteResultPage - User is not a valid vote moderator",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 			"action", "redirecting to home page",
 		)
 		c.Redirect(
@@ -853,6 +894,7 @@ func ViewVoteResultPage(c *gin.Context) {
 			"ViewVoteResultPage - failed to get vote data by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -868,6 +910,7 @@ func ViewVoteResultPage(c *gin.Context) {
 			"ViewVoteResultPage - failed to get candidates by vote ID",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -883,6 +926,7 @@ func ViewVoteResultPage(c *gin.Context) {
 			"ViewVoteResultPage - failed to marshal candidates",
 			"error", err.Error(),
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		utils.RenderError(
 			c,
@@ -898,6 +942,7 @@ func ViewVoteResultPage(c *gin.Context) {
 		logger.Warn(
 			"ViewVoteResultPage - no candidates found",
 			"Client IP", c.ClientIP(),
+			"Username", username,
 		)
 		isExist = false
 	}
@@ -905,6 +950,7 @@ func ViewVoteResultPage(c *gin.Context) {
 	logger.Info(
 		"ViewVoteResultPage - rendering vote result page",
 		"Client IP", c.ClientIP(),
+		"Username", username,
 	)
 	context := gin.H {
 		"title": "Vote Result",
