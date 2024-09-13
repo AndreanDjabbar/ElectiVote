@@ -42,6 +42,7 @@ func ConnectToDatabase() {
 		&models.Vote{},
 		&models.Candidate{},
 		&models.VoteRecord{},
+		&models.VoteHistory{},
 	)
 	if err != nil {
 		logger.Error("Error migrating database", "error", err)
