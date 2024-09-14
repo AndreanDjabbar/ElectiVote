@@ -1097,3 +1097,85 @@ func ViewVoteHistoryPage(c *gin.Context) {
 		context,
 	)
 }
+
+func ViewVoteHistoryDetailPage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewVoteHistoryDetailPage - User is not logged in",
+			"Client IP", c.ClientIP(),
+			"action", "redirecting to login page",
+		)
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	username := middlewares.GetUserData(c)
+	userID, err := repositories.GetUserIdByUsername(username)
+	if err != nil {
+		logger.Error(
+			"ViewVoteHistoryDetailPage - failed to get user ID by username",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/vote-history-page/",
+		)
+		return
+	}
+	voteHistoryID, _ := strconv.Atoi(c.Param("voteHistoryID"))
+	voteHistory, err := repositories.GetVoteHistoryByVoteHistoryID(uint(voteHistoryID))
+	if err != nil {
+		logger.Error(
+			"ViewVoteHistoryDetailPage - failed to get vote history by vote history ID",
+			"error", err.Error(),
+			"Client IP", c.ClientIP(),
+			"Username", username,
+		)
+		utils.RenderError(
+			c,
+			http.StatusInternalServerError,
+			err.Error(),
+			"/electivote/vote-history-page/",
+		)
+	}
+
+	if uint(userID) != voteHistory.ModeratorID {
+		logger.Warn(
+			"ViewVoteHistoryDetailPage - User is not a valid vote moderator",
+			"Client IP", c.ClientIP(),
+			"Username", username,
+			"action", "redirecting to home page",
+		)
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/vote-history/page/",
+		)
+		return
+	}
+	isWinnerExist := true
+	if voteHistory.CandidateWinnerName == "None" {
+		isWinnerExist = false
+	}
+
+	logger.Info(
+		"ViewVoteHistoryDetailPage - rendering vote history detail page",
+		"Client IP", c.ClientIP(),
+		"Username", username,
+	)
+	context := gin.H {
+		"title": "Vote History Detail",
+		"voteHistory": voteHistory,
+		"isWinnerExist": isWinnerExist,
+	}
+	c.HTML(
+		http.StatusOK,
+		"voteHistoryDetail.html",
+		context,
+	)
+}
