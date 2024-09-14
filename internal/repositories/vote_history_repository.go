@@ -21,3 +21,12 @@ func CreateVoteHistory(voteHistory *models.VoteHistory) error {
 	}
 	return nil
 }
+
+func GetVoteHistoryByVoteHistoryID(voteHistoryID uint) (models.VoteHistory, error) {
+	voteHistory := models.VoteHistory{}
+	err := db.DB.Where("vote_history_id = ?", voteHistoryID).First(&voteHistory).Error
+	if err != nil {
+		return voteHistory, err
+	}
+	return voteHistory, nil
+}
