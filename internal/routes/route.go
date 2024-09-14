@@ -76,5 +76,6 @@ func SetUpRoutes(router *gin.Engine) {
 	}
 	{
 		mainRouter.GET("vote-history-page/", handlers.ViewVoteHistoryPage)
+		mainRouter.GET("vote-history-page/:voteHistoryID/", handlers.ViewVoteHistoryDetailPage)
 	}
 }
