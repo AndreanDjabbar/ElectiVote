@@ -402,3 +402,39 @@ func IsValidReCAPTCHA(c *gin.Context) bool {
 
 	return result["success"].(bool)
 }
+
+func ValidateFeedbackInput(feedbackMessage string, feedbackRate uint, c *gin.Context) (string, string, string) {
+	feedbackMessageErr, feedbackRateErr, captchaErr := "", "", ""
+	if feedbackMessage == "" {
+		logger.Warn(
+			"ValidateFeedbackInput - feedback message must be filled",
+			"Client IP", c.ClientIP(),
+		)
+		feedbackMessageErr = "Feedback Message must be filled"
+	}
+
+	if (feedbackMessage != "") && (len(feedbackMessage) < 5 || len(feedbackMessage) > 255) {
+		logger.Warn(
+			"ValidateFeedbackInput - feedback message must be between 5 and 255 characters",
+			"Client IP", c.ClientIP(),
+		)
+		feedbackMessageErr = "Feedback Message must be between 5 and 255 characters"
+	}
+
+	if feedbackRate == 0 {
+		logger.Warn(
+			"ValidateFeedbackInput - feedback rate must be filled",
+			"Client IP", c.ClientIP(),
+		)
+		feedbackRateErr = "Feedback Rate must be filled"
+	}
+
+	if !IsValidReCAPTCHA(c) {
+		logger.Warn(
+			"ValidateFeedbackInput - Invalid ReCAPTCHA",
+			"Client IP", c.ClientIP(),
+		)
+		captchaErr = "Invalid ReCAPTCHA"
+	}
+	return feedbackMessageErr, feedbackRateErr, captchaErr
+}
