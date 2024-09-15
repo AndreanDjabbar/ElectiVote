@@ -46,59 +46,39 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/home-page">Home</a>
+                <a class="nav-link active" aria-current="page" href="../home-page">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/profile-page">Profile</a>
+                <a class="nav-link active" aria-current="page" href="../profile-page">Profile</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/abous-us-page">About Us</a>
+                <a class="nav-link active" aria-current="page" href="../abous-us-page" style="font-weight: 700; color: #007bff;">About Us</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/logout">Logout</a>
+                <a class="nav-link active" aria-current="page" href="../logout">Logout</a>
               </li>
             </ul>
           </div>
         </div>
     </nav>
-    <div class="container">
-        <div class="row justify-content-center" style="margin-top: 100px;">
-            <div style="display: flex; flex-direction: column; justify-content: center; width: 60%; margin-top: 60px">
-                <h1 class="text-center">Vote History</h1>
-                <br><br><br><br><br>
+    <div class="py-5" style="margin-top: 200px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <span class="text-muted">Abous Us</span>
+                    <h2 class="display-5 fw-bold">ElectiVote</h2>
+                    <p class="lead">ElectiVote – Empowering Your Voice, Shaping Your Choice, Securing Our Future Together.</p>
+                    <div style="display: flex; gap: 30px;">
+                        <a class="btn btn-primary mt-2" href="">Give FeedBack</a>
+                        <a class="btn btn-success mt-2">Support Us</a>
+                    </div>
+                </div>
+                <div class="col-md-6 offset-md-1">
+                    <p class="lead">ElectiVote is a comprehensive platform designed to empower people through voting, providing a seamless and transparent way to make collective decisions. Whether it's for elections, community polls, feedback, or casual group decisions, ElectiVote is open to everyone. We believe in giving individuals and organizations the ability to conduct fair, secure, and easily accessible voting events, no matter the size or scope. Join us and shape the future with every vote!</p>
+                </div>
             </div>
-            {{ if .isExist }}
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th scope="col">No.</th>
-                  <th scope="col">Moderator Name</th>
-                  <th scope="col">Vote Title</th>
-                  <th scope="col">Command</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{ range $index, $history := .voteHistories }}
-                  <tr>
-                    
-                    <th scope="row">{{ $index | AddOne }}</th>
-                    <td>{{ $history.ModeratorName }}</td>
-                    <td>{{ $history.VoteTitle }}</td>
-                    <td><a href="{{ $history.VoteHistoryID }}" class="btn btn-success">Detail</a></td>
-                  </tr>
-                {{end}}
-              </tbody>
-            </table>
-            {{ else }}
-              <h4 class="text-center">No Vote History...</h4>
-            {{ end }}
-        </div>
-        <div class="text-center">
-          <br><br><br><br>
-          <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="/electivote/home-page/">Back</a>
         </div>
     </div>
-    <br><br><br><br><br><br><br>
     <script>
         feather.replace();
     </script>
