@@ -79,6 +79,10 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.GET("vote-history-page/:voteHistoryID/", handlers.ViewVoteHistoryDetailPage)
 	}
 	{
-		mainRouter.GET("abous-us-page/", handlers.ViewAboutUsPage)
+		mainRouter.GET("about-us-page/", handlers.ViewAboutUsPage)
+	}
+	{
+		mainRouter.GET("feedback-page/", handlers.ViewGiveFeedbackPage)
+		mainRouter.POST("feedback-page/", handlers.GiveFeedbackPage)
 	}
 }
