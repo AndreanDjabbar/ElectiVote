@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-
 	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
 	"github.com/gin-gonic/gin"
 )
