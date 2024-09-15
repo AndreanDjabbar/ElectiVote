@@ -37,7 +37,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div class="container-fluid">
           <a class="navbar-brand" href="/">ElectiVote</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,7 +90,12 @@
               <h4 class="text-center">No Vote History...</h4>
             {{ end }}
         </div>
+        <div class="text-center">
+          <br><br><br><br>
+          <a data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block mb-4" style="width: 210px;" href="/electivote/home-page/">Back</a>
+        </div>
     </div>
+    <br><br><br><br><br><br><br>
     <script>
         feather.replace();
     </script>
