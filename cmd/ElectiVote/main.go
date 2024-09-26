@@ -26,7 +26,7 @@ func main() {
 	logger.Info("Server is run on", "host", host, "port", port)
 	err := router.Run(fmt.Sprintf("%s:%s", host, port))
 	if err != nil {
-		logger.Error("Server failed to start", "error", err)
-		panic(err)
+		logger.Error("Server failed to start", "error", err.Error())
+		return 
 	}
 }
