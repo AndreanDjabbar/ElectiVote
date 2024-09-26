@@ -3,3 +3,4 @@ internal/assets/images/*
 tmp/
 .env
 logs/*
+ElectiVoteDB.session.sql
