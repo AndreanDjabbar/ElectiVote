@@ -17,13 +17,10 @@ func init() {
 }
 
 func main() {
-	// Load .env file hanya jika tidak dijalankan di Railway
-	if os.Getenv("RAILWAY_ENVIRONMENT") == "" {
-		err := godotenv.Load()
-		if err != nil {
-			fmt.Println("Error loading .env file")
-			return // Kembali jika terjadi kesalahan
-		}
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
 	}
 
 	logger := config.SetUpLogger()
@@ -43,7 +40,7 @@ func main() {
 	}
 
 	logger.Info("Server is run on", "host", host, "port", port)
-	err := router.Run(fmt.Sprintf("%s:%s", host, port))
+	err = router.Run(fmt.Sprintf("%s:%s", host, port))
 	if err != nil {
 		logger.Error("Server failed to start", "error", err)
 		panic(err)
