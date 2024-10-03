@@ -1,0 +1,52 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      HOST: ${HOST}
+      PORT: ${PORT}
+      SECRET_KEY: ${SECRET_KEY}
+      SESSION_KEY: ${SESSION_KEY}
+      COOKIE_KEY: ${COOKIE_KEY}
+      DEBUG: ${DEBUG}
+      GMAIL_EMAIL: ${GMAIL_EMAIL}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+      OUTLOOK_EMAIL: ${OUTLOOK_EMAIL}
+      OUTLOOK_PASSWORD: ${OUTLOOK_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app  
+      - ./internal/assets/images:/app/internal/assets/images  
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER           
+      MYSQL_PASSWORD: $DB_PASS   
+      MYSQL_ROOT_PASSWORD: admin12 
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  db_data:

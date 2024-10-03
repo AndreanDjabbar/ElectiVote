@@ -1,0 +1,11 @@
+/build
+*.out
+
+logs
+*.log
+*.tmp
+
+.git
+.gitignore
+
+.DS_Store
