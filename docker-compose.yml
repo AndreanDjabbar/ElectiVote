@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  app:
+  electivote-app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -24,13 +24,13 @@ services:
       OUTLOOK_EMAIL: ${OUTLOOK_EMAIL}
       OUTLOOK_PASSWORD: ${OUTLOOK_PASSWORD}
     depends_on:
-      db:
+      electivote-db:
         condition: service_healthy
     volumes:
       - .:/app  
       - ./internal/assets/images:/app/internal/assets/images  
 
-  db:
+  electivote-db:
     image: mysql:8.0
     restart: always
     environment:
