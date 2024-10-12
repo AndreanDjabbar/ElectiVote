@@ -12,7 +12,6 @@ import (
 )
 
 func init() {
-	// Menghubungkan ke database
 	db.ConnectToDatabase()
 }
 

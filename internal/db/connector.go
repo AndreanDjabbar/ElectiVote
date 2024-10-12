@@ -27,7 +27,7 @@ func ConnectToDatabase() {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
-
+	fmt.Println(dsn)
 	database, err := gorm.Open(		
 		mysql.Open(dsn),
 		&gorm.Config{},
@@ -44,6 +44,7 @@ func ConnectToDatabase() {
 		&models.VoteRecord{},
 		&models.VoteHistory{},
 		&models.Feedback{},
+		&models.Support{},
 	)
 	if err != nil {
 		logger.Error("Error migrating database", "error", err)

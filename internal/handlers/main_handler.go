@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+
 	"github.com/AndreanDjabbar/ElectiVote/internal/middlewares"
 	"github.com/gin-gonic/gin"
 )
@@ -62,6 +63,35 @@ func ViewAboutUsPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"aboutUs.html",
+		context,
+	)
+}
+
+func ViewSupportPage(c *gin.Context) {
+	if !middlewares.IsLogged(c) {
+		logger.Warn(
+			"ViewHomePage - User is not logged in",
+			"Client IP", c.ClientIP(),
+			"action", "redirecting to login page",
+		)
+		c.Redirect(
+			http.StatusFound,
+			"/electivote/login-page/",
+		)
+		return
+	}
+	username := middlewares.GetUserData(c)
+	logger.Info(
+		"ViewSupportPage - rendering support page",
+		"Client IP", c.ClientIP(),
+		"Username", username,
+	)
+	context := gin.H {
+		"title": "Support",
+	}
+	c.HTML(
+		http.StatusOK,
+		"supportPage.html",
 		context,
 	)
 }
