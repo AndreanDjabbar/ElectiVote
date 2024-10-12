@@ -85,4 +85,10 @@ func SetUpRoutes(router *gin.Engine) {
 		mainRouter.GET("feedback-page/", handlers.ViewGiveFeedbackPage)
 		mainRouter.POST("feedback-page/", handlers.GiveFeedbackPage)
 	}
+	{
+		mainRouter.GET("support-page/", handlers.ViewSupportPage)
+		mainRouter.GET("support-page/saweria/", handlers.ViewSaweriaPage)
+		mainRouter.POST("webhook/saweria", handlers.SaweriaWebhook)
+		mainRouter.GET("thanks-page/", handlers.ViewThanksPage)
+	}
 }
