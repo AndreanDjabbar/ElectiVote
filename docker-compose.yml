@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   electivote-app:
     build:
@@ -23,8 +21,12 @@ services:
       GMAIL_PASSWORD: ${GMAIL_PASSWORD}
       OUTLOOK_EMAIL: ${OUTLOOK_EMAIL}
       OUTLOOK_PASSWORD: ${OUTLOOK_PASSWORD}
+      REDIS_URL: ${REDIS_URL}
+      SAWERIA_SECRET_KEY: ${SAWERIA_SECRET_KEY}
     depends_on:
       electivote-db:
+        condition: service_healthy
+      redis: 
         condition: service_healthy
     volumes:
       - .:/app  
@@ -44,6 +46,17 @@ services:
       - db_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
