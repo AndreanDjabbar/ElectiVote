@@ -13,20 +13,31 @@
         }
 
         .password-container input {
-            padding-right: 40px;
+            padding-right: 40px; /* Space for the toggle eye icon */
         }
 
-        .password-container .toggle-password {
+        .toggle-password {
             position: absolute;
-            top: 50%;
-            right: 10px;
+            right: 10px; /* Adjust as needed */
             transform: translateY(-50%);
             cursor: pointer;
         }
 
-        .password-container .toggle-password img {
-            width: 20px;
-            height: 20px;
+        .toggle-password img {
+            width: 20px; /* Size of the eye icon */
+            height: 20px; /* Size of the eye icon */
+        }
+
+        .error {
+            position: relative;
+        }
+
+        .error .toggle-password {
+            top: 25%; /* Position for error */
+        }
+
+        .no-error .toggle-password {
+            top: 50%; /* Position when no error */
         }
     </style>
 </head>
@@ -46,18 +57,17 @@
                     <input type="text" id="username" name="username" value="{{.username}}" placeholder="Username" class="form-control" required />
                     {{end}}
                 </div>
-                <div class="password-container form-outline mb-4">
-                    {{if .passwordErr}}
+                <div class="password-container form-outline mb-4 {{if .passwordErr}}error{{else}}no-error{{end}}">
                     <input type="password" id="password" name="password" placeholder="Password" value="{{.password}}" class="form-control" required />
                     <span class="toggle-password">
+                        {{if .passwordErr}}
                         <img src="/images/eye-closed.svg" alt="Show Password" class="eye-icon" />
-                    </span>
-                    <p style="color: red;">{{.passwordErr}}</p>
-                    {{else}}
-                    <input type="password" id="password" name="password" placeholder="Password" value="{{.password}}" class="form-control" required />
-                    <span class="toggle-password">
+                        {{else}}
                         <img src="/images/eye.svg" alt="Show Password" class="eye-icon" />
+                        {{end}}
                     </span>
+                    {{if .passwordErr}}
+                    <p style="color: red; margin-top: 5px;">{{.passwordErr}}</p>
                     {{end}}
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -103,7 +113,7 @@
                     eyeImage.alt = "Hide Password";
                 } else {
                     passwordInput.type = 'password';
-                    eyeImage.src = "/images/eye.svg"; 
+                    eyeImage.src = '/images/eye.svg';
                     eyeImage.alt = "Show Password";
                 }
             });
