@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
@@ -107,16 +108,31 @@ func CreateVotePage(c *gin.Context) {
 				"/electivote/create-vote-page/",
 			)
 		}
-
+		lastVoteID, err := repositories.GetLastVoteID()
+		if err != nil {
+			logger.Error(
+				"CreateVotePage - failed to get last vote ID",
+				"error", err.Error(),
+				"Client IP", c.ClientIP(),
+				"Username", username,
+			)
+			utils.RenderError(
+				c,
+				http.StatusInternalServerError,
+				err.Error(),
+				"/electivote/create-vote-page/",
+			)
+		}
+		manageVoteURL := fmt.Sprintf("/electivote/manage-vote-page/%d/", lastVoteID)
 		logger.Info(
 			"CreateVotePage - vote created",
 			"Client IP", c.ClientIP(),
 			"Username", username,
-			"action", "redirecting to home page",
+			"action", "redirecting to manage vote page",
 		)
 		c.Redirect(
 			http.StatusFound,
-			"/electivote/home-page/",
+			manageVoteURL,
 		)
 		return
 	}
