@@ -117,3 +117,12 @@ func GetVoteIDByVoteCode(voteCode string) (uint, error) {
 	}
 	return vote.VoteID, nil
 }
+
+func GetLastVoteID() (uint, error) {
+	vote := models.Vote{}
+	err := db.DB.Last(&vote).Error
+	if err != nil {
+		return 0, err
+	}
+	return vote.VoteID, nil
+}
