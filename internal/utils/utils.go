@@ -187,6 +187,24 @@ func ValidateRegisterInput(username, password, password2, email string, c *gin.C
 		emailErr = "Email must contain @ and end with .com or .co.id"
 	}
 	
+	if user, err := repositories.GetUserByUsername(username); err == nil || user.Username != "" {
+		logger.Warn(
+			"ValidateRegisterInput - username already exists",
+			"Inputted Username", username,
+			"Client IP", c.ClientIP(),
+		)
+		usernameErr = "Username already exists"
+	}
+
+	if email, err := repositories.GetUserByEmail(email); err == nil || email.Email != "" {
+		logger.Warn(
+			"ValidateRegisterInput - email already exists",
+			"Inputted Email", email,
+			"Client IP", c.ClientIP(),
+		)
+		emailErr = "Email already exists"
+	}
+
 	return usernameErr, passwordErr, password2Err, emailErr
 }
 
@@ -207,7 +225,7 @@ func ValidateProfileInput(firstName, lastname, phone string, age uint, c *gin.Co
 		firstNameErr = "First Name must be between 5 and 255 characters"
 	}
 
-	if lastname != "" && (len(lastname) < 5 || len(lastname) > 255) {
+	if lastname != "" && (len(lastname) > 255) {
 		logger.Warn(
 			"ValidateProfileInput - last name must be between 5 and 255 characters",
 			"Inputted Last Name", lastname,

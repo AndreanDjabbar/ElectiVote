@@ -4,122 +4,309 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.title}}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://unpkg.com/feather-icons"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,400;0,700;1,700&display=swap" rel="stylesheet">
     <style>
-            .gradient-custom {
-                background: #f6d365;
-                background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --error-color: #dc3545;
+            --success-color: #198754;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff !important;
+            padding: 12px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+        }
+        
+        .profile-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .profile-sidebar {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            height: 100%;
+        }
+        
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .profile-name {
+            font-weight: 600;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+        
+        .edit-profile-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+        
+        .edit-profile-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .edit-profile-btn i {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .profile-info {
+            padding: 40px 30px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .info-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), #6a11cb);
+            border-radius: 3px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .info-item {
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-sidebar {
+                padding: 30px 15px;
             }
+            
+            .profile-info {
+                padding: 30px 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .profile-image {
+                width: 120px;
+                height: 120px;
+            }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/">ElectiVote</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/home-page">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/profile-page" style="font-weight: 700; color: #007bff;">Profile</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/about-us-page">About Us</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/electivote/logout">Logout</a>
-              </li>
-            </ul>
-          </div>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">ElectiVote</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/electivote/home-page">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/electivote/profile-page">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/electivote/about-us-page">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/electivote/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-    <section class="vh-100" style="background-color: #f4f5f7;">
-        <div class="container py-5 h-100">
-          <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col col-lg-6 mb-4 mb-lg-0">
-              <div class="card mb-3" style="border-radius: .5rem;">
-                <div class="row g-0">
-                  <div class="col-md-4 gradient-custom text-center text-white"
-                    style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
-                    <img src="/images/{{.userProfile.Picture}}"
-                      alt="Avatar" class="img-fluid my-5" style="width: 120px;" />
-                    {{ if or .userProfile.FirstName .userProfile.LastName }}
-                      <h5>{{ .userProfile.FirstName }} {{.userProfile.LastName}}</h5>
-                      {{ else }}
-                      <h5>None</h5>
-                  {{ end }}
-                  <br>
-                        <a href="../edit-profile-page" style="display: flex; justify-content: center; gap: 5px; text-decoration: none; color: #9a289c;">
+    
+    <div class="profile-container">
+        <div class="profile-card animate__animated animate__fadeIn">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div class="profile-sidebar">
+                        <img 
+                            src="/images/{{.userProfile.Picture}}" 
+                            alt="Profile Picture" 
+                            class="profile-image animate__animated animate__fadeIn animate__delay-1s"
+                            onerror="this.src='/images/default-avatar.png'"
+                        />
+                        
+                        <h3 class="profile-name animate__animated animate__fadeIn animate__delay-1s">
+                            {{ if or .userProfile.FirstName .userProfile.LastName }}
+                                {{ .userProfile.FirstName }} {{.userProfile.LastName}}
+                            {{ else }}
+                                <span class="text-white-50">Add your name</span>
+                            {{ end }}
+                        </h3>
+                        
+                        <a href="../edit-profile-page" class="edit-profile-btn animate__animated animate__fadeIn animate__delay-2s">
                             <i data-feather="edit"></i>
-                            <p>Edit profile</p>
+                            Edit Profile
                         </a>
-                    <i class="far fa-edit mb-5"></i>
-                  </div>
-                  <div class="col-md-8">
-                    <div class="card-body p-4">
-                      <h6>Information</h6>
-                      <hr class="mt-0 mb-4">
-                      <div class="row pt-1">
-                        <div class="col-6 mb-3">
-                          <h6>Email</h6>
-                          {{ if .userEmail }}
-                            <p class="text-muted">{{ .userEmail }}</p>
-                            {{ else }}
-                            <p class="text-muted">None</p>
-                          {{ end }}
-                        </div>
-                        <div class="col-6 mb-3">
-                          <h6>Phone</h6>
-                          {{ if .userProfile.PhoneNumber }}
-                            <p class="text-muted">{{ .userProfile.PhoneNumber }}</p>
-                            {{ else }}
-                          <p class="text-muted">None</p>
-                          {{ end }}
-                        </div>
-                        <div class="col-6 mb-3">
-                          <h6>Age</h6>
-                          {{ if .userProfile.Age }}
-                            <p class="text-muted">{{ .userProfile.Age }}</p>
-                            {{ else }}
-                          <p class="text-muted">None</p>
-                          {{ end }}
-                        </div>
-                        <div class="col-6 mb-3">
-                          <h6>Birthday</h6>
-                          {{ if .userProfile.Birthday }}
-                            <p class="text-muted">{{ .birthday }}</p>
-                            {{ else }}
-                          <p class="text-muted">None</p>
-                          {{ end }}
-                        </div>
-                      </div>
-                      <div class="row pt-1">
-                        <div class="col-6 mb-3">
-                      </div>
-                      <div class="d-flex justify-content-start">
-                        <a href="#!"><i class="fab fa-facebook-f fa-lg me-3"></i></a>
-                        <a href="#!"><i class="fab fa-twitter fa-lg me-3"></i></a>
-                        <a href="#!"><i class="fab fa-instagram fa-lg"></i></a>
-                      </div>
                     </div>
-                  </div>
                 </div>
-              </div>
+                
+                <div class="col-md-8">
+                    <div class="profile-info">
+                        <div class="info-section animate__animated animate__fadeIn animate__delay-1s">
+                            <h4 class="info-title">Personal Information</h4>
+                            
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <h6 class="info-label">Email</h6>
+                                    <p class="info-value">
+                                        {{ if .userEmail }}
+                                            {{ .userEmail }}
+                                        {{ else }}
+                                            <span class="text-muted">Not provided</span>
+                                        {{ end }}
+                                    </p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <h6 class="info-label">Phone</h6>
+                                    <p class="info-value">
+                                        {{ if .userProfile.PhoneNumber }}
+                                            {{ .userProfile.PhoneNumber }}
+                                        {{ else }}
+                                            <span class="text-muted">Not provided</span>
+                                        {{ end }}
+                                    </p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <h6 class="info-label">Age</h6>
+                                    <p class="info-value">
+                                        {{ if .userProfile.Age }}
+                                            {{ .userProfile.Age }}
+                                        {{ else }}
+                                            <span class="text-muted">Not provided</span>
+                                        {{ end }}
+                                    </p>
+                                </div>
+                                
+                                <div class="info-item">
+                                  <h6 class="info-label">Birthday</h6>
+                                  <p class="info-value">
+                                      {{ if .birthday }}
+                                          {{ .birthday }}
+                                      {{ else }}
+                                          <span class="text-muted">Not provided</span>
+                                      {{ end }}
+                                  </p>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </section>
+    </div>
+
     <script>
         feather.replace();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

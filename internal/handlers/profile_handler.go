@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
@@ -102,7 +103,7 @@ func ViewProfilePage(c *gin.Context) {
 		"userEmail":   userEmail,
 		"birthday":    formattedDob,
 	}
-
+	fmt.Println("userProfile", userProfile.Birthday)
 	c.HTML(
 		http.StatusOK,
 		"profile.html",

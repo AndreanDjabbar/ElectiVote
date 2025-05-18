@@ -294,7 +294,7 @@ func ForgotPasswordPage(c *gin.Context) {
 	}
 	emailDomain := utils.GetEmailDomain(email)
 	emailProvider := utils.GetEmailProvider(emailDomain)
-	resetURL := fmt.Sprintf("http://localhost:8080/electivote/reset-password-page/%s", tokenString)
+	resetURL := fmt.Sprintf("http://localhost:8081/electivote/reset-password-page/%s", tokenString)
 	body := fmt.Sprintf(`
     <html>
     <head>

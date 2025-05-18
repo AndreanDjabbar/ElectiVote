@@ -1,21 +1,4 @@
 services:
-  electivote-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env 
-    depends_on:
-      electivote-db:
-        condition: service_healthy
-      redis: 
-        condition: service_healthy
-    volumes:
-      - .:/app  
-      - ./internal/assets/images:/app/internal/assets/images  
-
   electivote-db:
     image: mysql:8.0
     restart: always

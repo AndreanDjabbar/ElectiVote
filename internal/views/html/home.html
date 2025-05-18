@@ -4,96 +4,280 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.title}}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://unpkg.com/feather-icons"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,400;0,700;1,700&display=swap" rel="stylesheet">
     <style>
-        .icon-large {
-            width : 65px;
-            margin-top: 10px;
-            height: 65px;
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --error-color: #dc3545;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --dark-color: #6c757d;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
         
-        .icon-menu {
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff !important;
+            padding: 12px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+        }
+        
+        .home-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            transition: all 0.3s ease;
+            text-align: center;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
-
-        .icon-menu p {
-            font-size: 18px;
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .icon-container {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-create {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn-create:hover {
+            background-color: #157347;
+            border-color: #157347;
+            transform: scale(1.05);
+        }
+        
+        .btn-join {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-join:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: scale(1.05);
+        }
+        
+        .btn-manage {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+        
+        .btn-manage:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+            transform: scale(1.05);
+        }
+        
+        .btn-history {
+            background-color: var(--dark-color);
+            border-color: var(--dark-color);
+        }
+        
+        .btn-history:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+            transform: scale(1.05);
+        }
+        
+        .icon-large {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+        
+        .feature-title {
             font-weight: 600;
+            margin-top: 15px;
+            font-size: 1.25rem;
+            color: var(--text-color);
         }
-
-        .icon-menu a {
-            border-radius: 25px;
-            width: 100px;
-            height: 100px;
+        
+        .feature-description {
+            margin-top: 10px;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        
+        .page-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+        
+        .page-subtitle {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .feature-card {
+                padding: 20px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .icon-container {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .icon-large {
+                width: 35px;
+                height: 35px;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/">ElectiVote</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="../home-page" style="font-weight: 700; color: #007bff;">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="../profile-page">Profile</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="../about-us-page">About Us</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="../logout">Logout</a>
-              </li>
-            </ul>
-          </div>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">ElectiVote</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="../home-page">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../profile-page">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../about-us-page">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-    <div class="container justify-content-center align-items-center" style="margin-top: 200px; padding: 20px;">
-        <div class="text-center" style="display: flex; justify-content: center; gap: 150px; padding: 10px; width: 100%;">
-            <div class="icon-menu">
-                <a href="/electivote/create-vote-page/" class="btn btn-success">
+    
+    <div class="home-container">
+        <h1 class="page-title animate__animated animate__fadeIn">Welcome to ElectiVote</h1>
+        <p class="page-subtitle animate__animated animate__fadeIn animate__delay-1s">Your simple and secure platform for creating, managing, and participating in votes. What would you like to do today?</p>
+        
+        <div class="features-grid">
+            <div class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="icon-container btn-create">
                     <i data-feather="trello" class="icon-large"></i>
-                </a>
-                <p>Create New Vote</p>
+                </div>
+                <h2 class="feature-title">Create New Vote</h2>
+                <p class="feature-description">Set up a new voting session with custom options and settings.</p>
+                <a href="/electivote/create-vote-page/" class="btn btn-success mt-3">Create Vote</a>
             </div>
-            <div class="icon-menu">
-                <a href="/electivote/join-vote-page/" class="btn btn-primary">
+            
+            <div class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="icon-container btn-join">
                     <i data-feather="plus-square" class="icon-large"></i>
-                </a>
-                <p>Join Vote</p>
+                </div>
+                <h2 class="feature-title">Join Vote</h2>
+                <p class="feature-description">Participate in an existing vote using a unique vote code.</p>
+                <a href="/electivote/join-vote-page/" class="btn btn-primary mt-3">Join Vote</a>
             </div>
-        </div>
-        <div class="text-center" style="display: flex; justify-content: center; gap: 160px; padding: 10px; width: 100%;">
-            <div class="icon-menu">
-                <a href="/electivote/manage-vote-page/" class="btn btn-warning">
+            
+            <div class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="icon-container btn-manage">
                     <i data-feather="archive" class="icon-large"></i>
-                </a>
-                <p>Manage Votes</p>
+                </div>
+                <h2 class="feature-title">Manage Votes</h2>
+                <p class="feature-description">View, edit, or delete votes you've created and monitor results.</p>
+                <a href="/electivote/manage-vote-page/" class="btn btn-warning mt-3">Manage Votes</a>
             </div>
-            <div class="icon-menu">
-                <a href="/electivote/vote-history-page/" class="btn btn-secondary">
+            
+            <div class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="icon-container btn-history">
                     <i data-feather="book" class="icon-large"></i>
-                </a>
-                <p>Vote History</p>
+                </div>
+                <h2 class="feature-title">Vote History</h2>
+                <p class="feature-description">Review your voting history and see past participation.</p>
+                <a href="/electivote/vote-history-page/" class="btn btn-secondary mt-3">View History</a>
             </div>
         </div>
     </div>
+    
     <script>
         feather.replace();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
